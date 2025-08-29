@@ -1,0 +1,222 @@
+[gd_scene load_steps=3 format=3 uid="uid://d2kxm7hcbgfyv"]
+
+[ext_resource type="Script" path="res://scripts/ui/StarMapController.gd" id="1_5k7vr"]
+
+[sub_resource type="Theme" id="Theme_1"]
+
+[node name="StarMap" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = SubResource("Theme_1")
+script = ExtResource("1_5k7vr")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.05, 0.1, 1)
+
+[node name="MainContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+
+[node name="ContractListPanel" type="Panel" parent="MainContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/ContractListPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer/ContractListPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/ContractListPanel/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "AVAILABLE CONTRACTS"
+horizontal_alignment = 1
+
+[node name="RefreshButton" type="Button" parent="MainContainer/ContractListPanel/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+text = "Refresh"
+
+[node name="BackButton" type="Button" parent="MainContainer/ContractListPanel/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+text = "Back"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer/ContractListPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/ContractListPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ContractList" type="VBoxContainer" parent="MainContainer/ContractListPanel/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ContractDetailsPanel" type="Panel" parent="MainContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/ContractDetailsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="ContractNameLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer"]
+layout_mode = 2
+text = "Select a Contract"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer/ContractDetailsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="DetailsScrollContainer" type="ScrollContainer" parent="MainContainer/ContractDetailsPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DetailsContainer" type="VBoxContainer" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BasicInfoContainer" type="VBoxContainer" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer"]
+layout_mode = 2
+
+[node name="BasicInfoLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/BasicInfoContainer"]
+layout_mode = 2
+text = "CONTRACT DETAILS"
+horizontal_alignment = 1
+
+[node name="BasicInfoSeparator" type="HSeparator" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/BasicInfoContainer"]
+layout_mode = 2
+
+[node name="EmployerLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/BasicInfoContainer"]
+layout_mode = 2
+text = "Employer: --"
+
+[node name="LocationLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/BasicInfoContainer"]
+layout_mode = 2
+text = "Location: --"
+
+[node name="TypeLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/BasicInfoContainer"]
+layout_mode = 2
+text = "Type: --"
+
+[node name="DifficultyLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/BasicInfoContainer"]
+layout_mode = 2
+text = "Difficulty: --"
+
+[node name="DurationLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/BasicInfoContainer"]
+layout_mode = 2
+text = "Duration: --"
+
+[node name="HSeparator2" type="HSeparator" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer"]
+layout_mode = 2
+
+[node name="PaymentContainer" type="VBoxContainer" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer"]
+layout_mode = 2
+
+[node name="PaymentLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/PaymentContainer"]
+layout_mode = 2
+text = "PAYMENT TERMS"
+horizontal_alignment = 1
+
+[node name="PaymentSeparator" type="HSeparator" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/PaymentContainer"]
+layout_mode = 2
+
+[node name="BasePaymentLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/PaymentContainer"]
+layout_mode = 2
+text = "Base Payment: --"
+
+[node name="BonusPaymentLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/PaymentContainer"]
+layout_mode = 2
+text = "Success Bonus: --"
+
+[node name="AdvanceLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/PaymentContainer"]
+layout_mode = 2
+text = "Advance Payment: --"
+
+[node name="SalvageLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/PaymentContainer"]
+layout_mode = 2
+text = "Salvage Rights: --"
+
+[node name="HSeparator3" type="HSeparator" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer"]
+layout_mode = 2
+
+[node name="RequirementsContainer" type="VBoxContainer" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer"]
+layout_mode = 2
+
+[node name="RequirementsLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/RequirementsContainer"]
+layout_mode = 2
+text = "REQUIREMENTS"
+horizontal_alignment = 1
+
+[node name="RequirementsSeparator" type="HSeparator" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/RequirementsContainer"]
+layout_mode = 2
+
+[node name="MechRequirementLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/RequirementsContainer"]
+layout_mode = 2
+text = "Mechs Required: --"
+
+[node name="HSeparator4" type="HSeparator" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer"]
+layout_mode = 2
+
+[node name="DescriptionContainer" type="VBoxContainer" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer"]
+layout_mode = 2
+
+[node name="DescriptionLabel" type="Label" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/DescriptionContainer"]
+layout_mode = 2
+text = "MISSION BRIEFING"
+horizontal_alignment = 1
+
+[node name="DescriptionSeparator" type="HSeparator" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/DescriptionContainer"]
+layout_mode = 2
+
+[node name="DescriptionText" type="RichTextLabel" parent="MainContainer/ContractDetailsPanel/VBoxContainer/DetailsScrollContainer/DetailsContainer/DescriptionContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Select a contract to view details."
+
+[node name="HSeparator5" type="HSeparator" parent="MainContainer/ContractDetailsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ActionButtonContainer" type="HBoxContainer" parent="MainContainer/ContractDetailsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="AcceptContractButton" type="Button" parent="MainContainer/ContractDetailsPanel/VBoxContainer/ActionButtonContainer"]
+layout_mode = 2
+text = "Accept Contract"
+disabled = true
+
+[node name="AdvanceTimeButton" type="Button" parent="MainContainer/ContractDetailsPanel/VBoxContainer/ActionButtonContainer"]
+layout_mode = 2
+text = "Advance Time (7 days)"
+
+[connection signal="pressed" from="MainContainer/ContractListPanel/VBoxContainer/HeaderContainer/RefreshButton" to="." method="_on_refresh_button_pressed"]
+[connection signal="pressed" from="MainContainer/ContractListPanel/VBoxContainer/HeaderContainer/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="MainContainer/ContractDetailsPanel/VBoxContainer/ActionButtonContainer/AcceptContractButton" to="." method="_on_accept_contract_button_pressed"]
+[connection signal="pressed" from="MainContainer/ContractDetailsPanel/VBoxContainer/ActionButtonContainer/AdvanceTimeButton" to="." method="_on_advance_time_button_pressed"]

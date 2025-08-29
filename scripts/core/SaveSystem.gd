@@ -78,8 +78,18 @@ func collect_save_data() -> Dictionary:
 	if game_manager:
 		save_data.game_data["current_state"] = game_manager.current_state
 	
-	# Company data will be collected here once implemented
-	# save_data.game_data["company"] = CompanyManager.get_save_data()
+	# Company data
+	var company_manager = get_node_or_null("/root/CompanyManager")
+	if company_manager:
+		save_data.game_data["company"] = company_manager.get_save_data()
+	
+	# Time data
+	if game_manager and game_manager.time_manager:
+		save_data.game_data["time"] = {
+			"current_day": game_manager.time_manager.current_day,
+			"current_month": game_manager.time_manager.current_month,
+			"current_year": game_manager.time_manager.current_year
+		}
 	
 	# Combat data will be collected here once implemented
 	# save_data.game_data["combat"] = CombatManager.get_save_data()
@@ -93,14 +103,30 @@ func apply_save_data(save_data: Dictionary) -> void:
 	
 	var game_data = save_data.game_data
 	
-	# Apply game manager state
+	# Apply time data first
 	var game_manager = get_node("/root/GameManager")
+	if game_manager and game_data.has("time"):
+		var time_data = game_data.time
+		game_manager.time_manager.set_date(
+			time_data.get("current_day", 1),
+			time_data.get("current_month", 1),
+			time_data.get("current_year", 3025)
+		)
+	
+	# Apply company data
+	var company_manager = get_node_or_null("/root/CompanyManager")
+	if not company_manager:
+		# Create CompanyManager if it doesn't exist
+		company_manager = preload("res://scripts/systems/CompanyManager.gd").new()
+		company_manager.name = "CompanyManager"
+		get_tree().root.add_child(company_manager)
+	
+	if game_data.has("company"):
+		company_manager.load_save_data(game_data.company)
+	
+	# Apply game manager state last
 	if game_manager and game_data.has("current_state"):
 		game_manager.change_state(game_data.current_state)
-	
-	# Apply company data once implemented
-	# if game_data.has("company"):
-	#     CompanyManager.load_save_data(game_data.company)
 	
 	# Apply combat data once implemented
 	# if game_data.has("combat"):
