@@ -37,7 +37,7 @@ func change_scene_async(scene_path: String) -> void:
 		current_scene.queue_free()
 		await current_scene.tree_exited
 	
-	var loader = ResourceLoader.load_threaded_request(scene_path)
+	var _loader = ResourceLoader.load_threaded_request(scene_path)
 	
 	while true:
 		var progress = []

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bebg0hnb2fnm"]
 
-[ext_resource type="Script" path="res://scripts/ui/MainMenuController.gd" id="1_7qj8p"]
+[ext_resource type="Script" uid="uid://rqlwlidaenuw" path="res://scripts/ui/MainMenuController.gd" id="1_7qj8p"]
 
 [sub_resource type="Theme" id="Theme_1"]
 
@@ -9,6 +9,8 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme = SubResource("Theme_1")
 script = ExtResource("1_7qj8p")
 
@@ -17,6 +19,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0.1, 0.1, 0.15, 1)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
@@ -30,6 +34,8 @@ offset_left = -150.0
 offset_top = -200.0
 offset_right = 150.0
 offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Title" type="Label" parent="VBoxContainer"]
 layout_mode = 2
@@ -39,8 +45,8 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
-layout_mode = 2
 modulate = Color(1, 1, 1, 0)
+layout_mode = 2
 
 [node name="ButtonContainer" type="VBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
@@ -63,8 +69,8 @@ layout_mode = 2
 text = "Quit"
 
 [node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
-layout_mode = 2
 modulate = Color(1, 1, 1, 0)
+layout_mode = 2
 
 [node name="VersionLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
