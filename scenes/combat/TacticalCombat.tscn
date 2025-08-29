@@ -1,0 +1,208 @@
+[gd_scene load_steps=4 format=3 uid="uid://bsv2gf1kqvfiy"]
+
+[ext_resource type="Script" path="res://scripts/combat/TacticalCombatManager.gd" id="1_4x2p2"]
+[ext_resource type="Script" path="res://scripts/combat/HexGrid.gd" id="2_5y6nq"]
+[ext_resource type="Script" path="res://scripts/ui/TacticalCombatController.gd" id="3_8n4lp"]
+
+[node name="TacticalCombat" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.1, 0.1, 0.1, 1)
+
+[node name="CombatManager" type="Node" parent="."]
+script = ExtResource("1_4x2p2")
+
+[node name="HexGrid" type="Node2D" parent="CombatManager"]
+script = ExtResource("2_5y6nq")
+
+[node name="Camera2D" type="Camera2D" parent="CombatManager"]
+zoom = Vector2(1.5, 1.5)
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("3_8n4lp")
+
+[node name="TopPanel" type="Panel" parent="UI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 80.0
+
+[node name="TopContainer" type="HBoxContainer" parent="UI/TopPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="TurnInfoContainer" type="VBoxContainer" parent="UI/TopPanel/TopContainer"]
+layout_mode = 2
+
+[node name="TurnLabel" type="Label" parent="UI/TopPanel/TopContainer/TurnInfoContainer"]
+layout_mode = 2
+text = "Turn: 1"
+
+[node name="PhaseLabel" type="Label" parent="UI/TopPanel/TopContainer/TurnInfoContainer"]
+layout_mode = 2
+text = "Phase: Movement"
+
+[node name="CurrentUnitLabel" type="Label" parent="UI/TopPanel/TopContainer/TurnInfoContainer"]
+layout_mode = 2
+text = "Unit: Select Unit"
+
+[node name="VSeparator" type="VSeparator" parent="UI/TopPanel/TopContainer"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="UI/TopPanel/TopContainer"]
+layout_mode = 2
+
+[node name="EndTurnButton" type="Button" parent="UI/TopPanel/TopContainer/ButtonContainer"]
+layout_mode = 2
+text = "End Turn"
+
+[node name="ExitCombatButton" type="Button" parent="UI/TopPanel/TopContainer/ButtonContainer"]
+layout_mode = 2
+text = "Exit Combat"
+
+[node name="RightPanel" type="Panel" parent="UI"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = 80.0
+
+[node name="RightContainer" type="VBoxContainer" parent="UI/RightPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="UnitInfoLabel" type="Label" parent="UI/RightPanel/RightContainer"]
+layout_mode = 2
+text = "UNIT INFO"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="UI/RightPanel/RightContainer"]
+layout_mode = 2
+
+[node name="UnitDetailsContainer" type="VBoxContainer" parent="UI/RightPanel/RightContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="UnitNameLabel" type="Label" parent="UI/RightPanel/RightContainer/UnitDetailsContainer"]
+layout_mode = 2
+text = "No Unit Selected"
+
+[node name="UnitStatusLabel" type="Label" parent="UI/RightPanel/RightContainer/UnitDetailsContainer"]
+layout_mode = 2
+text = "Status: --"
+
+[node name="HSeparator2" type="HSeparator" parent="UI/RightPanel/RightContainer/UnitDetailsContainer"]
+layout_mode = 2
+
+[node name="HealthContainer" type="VBoxContainer" parent="UI/RightPanel/RightContainer/UnitDetailsContainer"]
+layout_mode = 2
+
+[node name="HealthLabel" type="Label" parent="UI/RightPanel/RightContainer/UnitDetailsContainer/HealthContainer"]
+layout_mode = 2
+text = "HEALTH"
+
+[node name="HealthBar" type="ProgressBar" parent="UI/RightPanel/RightContainer/UnitDetailsContainer/HealthContainer"]
+layout_mode = 2
+max_value = 100.0
+step = 1.0
+value = 100.0
+
+[node name="HealthValueLabel" type="Label" parent="UI/RightPanel/RightContainer/UnitDetailsContainer/HealthContainer"]
+layout_mode = 2
+text = "100 / 100"
+
+[node name="HeatContainer" type="VBoxContainer" parent="UI/RightPanel/RightContainer/UnitDetailsContainer"]
+layout_mode = 2
+
+[node name="HeatLabel" type="Label" parent="UI/RightPanel/RightContainer/UnitDetailsContainer/HeatContainer"]
+layout_mode = 2
+text = "HEAT"
+
+[node name="HeatBar" type="ProgressBar" parent="UI/RightPanel/RightContainer/UnitDetailsContainer/HeatContainer"]
+layout_mode = 2
+max_value = 30.0
+step = 1.0
+
+[node name="HeatValueLabel" type="Label" parent="UI/RightPanel/RightContainer/UnitDetailsContainer/HeatContainer"]
+layout_mode = 2
+text = "0 / 30"
+
+[node name="MovementContainer" type="VBoxContainer" parent="UI/RightPanel/RightContainer/UnitDetailsContainer"]
+layout_mode = 2
+
+[node name="MovementLabel" type="Label" parent="UI/RightPanel/RightContainer/UnitDetailsContainer/MovementContainer"]
+layout_mode = 2
+text = "MOVEMENT"
+
+[node name="MovementValueLabel" type="Label" parent="UI/RightPanel/RightContainer/UnitDetailsContainer/MovementContainer"]
+layout_mode = 2
+text = "0 / 4"
+
+[node name="HSeparator3" type="HSeparator" parent="UI/RightPanel/RightContainer/UnitDetailsContainer"]
+layout_mode = 2
+
+[node name="ActionButtonsContainer" type="VBoxContainer" parent="UI/RightPanel/RightContainer/UnitDetailsContainer"]
+layout_mode = 2
+
+[node name="AttackButton" type="Button" parent="UI/RightPanel/RightContainer/UnitDetailsContainer/ActionButtonsContainer"]
+layout_mode = 2
+text = "Attack Target"
+disabled = true
+
+[node name="WaitButton" type="Button" parent="UI/RightPanel/RightContainer/UnitDetailsContainer/ActionButtonsContainer"]
+layout_mode = 2
+text = "Wait"
+disabled = true
+
+[node name="BottomPanel" type="Panel" parent="UI"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -120.0
+
+[node name="MessageLog" type="RichTextLabel" parent="UI/BottomPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+bbcode_enabled = true
+text = "[b]Combat Log[/b]
+Combat initialized..."
+
+[connection signal="pressed" from="UI/TopPanel/TopContainer/ButtonContainer/EndTurnButton" to="UI" method="_on_end_turn_button_pressed"]
+[connection signal="pressed" from="UI/TopPanel/TopContainer/ButtonContainer/ExitCombatButton" to="UI" method="_on_exit_combat_button_pressed"]
+[connection signal="pressed" from="UI/RightPanel/RightContainer/UnitDetailsContainer/ActionButtonsContainer/AttackButton" to="UI" method="_on_attack_button_pressed"]
+[connection signal="pressed" from="UI/RightPanel/RightContainer/UnitDetailsContainer/ActionButtonsContainer/WaitButton" to="UI" method="_on_wait_button_pressed"]

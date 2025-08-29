@@ -197,21 +197,79 @@ func accept_contract(contract: ContractData) -> void:
 	# Add to company contracts
 	company_manager.contracts.append(contract)
 	
-	# Show mission start dialog
-	var dialog = AcceptDialog.new()
-	dialog.title = "Mission Accepted"
-	dialog.dialog_text = "Contract '%s' accepted!\n\nAdvance payment of %s received.\nPrepare your forces for deployment.\n\n[This will eventually start tactical combat]" % [
-		contract.contract_name,
-		format_currency(contract.get_advance_amount())
-	]
+	# Show mission deployment dialog
+	show_deployment_dialog(contract)
+
+func show_deployment_dialog(contract: ContractData) -> void:
+	var operational_mechs = company_manager.get_operational_mechs()
 	
-	add_child(dialog)
-	dialog.confirmed.connect(func():
-		# TODO: Transition to tactical combat or mission setup
-		game_manager.change_state(GameManager.GameState.COMPANY_MANAGEMENT)
+	if operational_mechs.size() < contract.required_mechs:
+		var dialog = AcceptDialog.new()
+		dialog.title = "Insufficient Forces"
+		dialog.dialog_text = "Contract requires %d operational mechs, but only %d are available.\nRepair mechs and assign pilots before deploying." % [
+			contract.required_mechs, operational_mechs.size()
+		]
+		add_child(dialog)
+		dialog.confirmed.connect(func(): dialog.queue_free())
+		dialog.popup_centered()
+		return
+	
+	var dialog = AcceptDialog.new()
+	dialog.title = "Deploy to Combat"
+	dialog.size = Vector2i(500, 400)
+	
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	
+	# Mission info
+	var mission_label = RichTextLabel.new()
+	mission_label.custom_minimum_size = Vector2(0, 100)
+	mission_label.bbcode_enabled = true
+	mission_label.text = "[b]Mission: %s[/b]\n%s\n\n[b]Operational Mechs:[/b] %d available" % [
+		contract.contract_name,
+		contract.description,
+		operational_mechs.size()
+	]
+	vbox.add_child(mission_label)
+	
+	# Deployment button
+	var deploy_button = Button.new()
+	deploy_button.text = "DEPLOY TO COMBAT"
+	deploy_button.pressed.connect(func():
+		start_tactical_combat(contract, operational_mechs)
 		dialog.queue_free()
 	)
+	vbox.add_child(deploy_button)
+	
+	# Cancel button
+	var cancel_button = Button.new()
+	cancel_button.text = "Cancel Mission"
+	cancel_button.pressed.connect(func():
+		# Refund advance and remove contract
+		company_manager.modify_funds(-contract.get_advance_amount())
+		company_manager.contracts.erase(contract)
+		dialog.queue_free()
+	)
+	vbox.add_child(cancel_button)
+	
+	dialog.add_child(vbox)
+	add_child(dialog)
 	dialog.popup_centered()
+
+func start_tactical_combat(contract: ContractData, operational_mechs: Array[MechUnit]) -> void:
+	# Store contract data for tactical combat
+	var combat_data = {
+		"contract": contract,
+		"player_mechs": operational_mechs.slice(0, min(operational_mechs.size(), contract.max_mechs))
+	}
+	
+	# TODO: Store combat data in a way that TacticalCombat can access it
+	# For now, we'll pass it via a global or the GameManager
+	var game_manager_node = get_node("/root/GameManager")
+	game_manager_node.set("current_combat_data", combat_data)
+	
+	# Transition to tactical combat
+	game_manager.change_state(GameManager.GameState.TACTICAL_COMBAT)
 
 func _on_advance_time_button_pressed() -> void:
 	var dialog = ConfirmationDialog.new()
