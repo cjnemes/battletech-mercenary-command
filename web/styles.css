@@ -1,0 +1,1350 @@
+/* Battletech Mercenary Command - Enhanced Visual Design */
+
+:root {
+    /* Enhanced Color Palette - Military/Sci-Fi Theme */
+    --primary-bg: #0c0f1a;
+    --secondary-bg: #161b2e;
+    --accent-bg: #1a2744;
+    --card-bg: #1e2640;
+    --panel-bg: #252d47;
+    
+    /* Text Colors with Better Contrast */
+    --primary-text: #ffffff;
+    --secondary-text: #b8c5d6;
+    --accent-text: #5aa3ff;
+    --highlight-text: #7db8ff;
+    --muted-text: #8491a3;
+    
+    /* Status Colors - Enhanced */
+    --success-color: #2ecc71;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --info-color: #3498db;
+    
+    /* Border and UI Elements */
+    --border-color: #2c3e50;
+    --border-accent: #34495e;
+    --border-highlight: #5aa3ff;
+    
+    /* Interactive Elements */
+    --hover-bg: #2a3651;
+    --active-bg: #1a2744;
+    --focus-glow: rgba(90, 163, 255, 0.4);
+    --shadow-light: rgba(90, 163, 255, 0.1);
+    --shadow-heavy: rgba(0, 0, 0, 0.6);
+    
+    /* Gradient Effects */
+    --gradient-primary: linear-gradient(135deg, #1a2744 0%, #252d47 100%);
+    --gradient-accent: linear-gradient(135deg, #5aa3ff 0%, #3498db 100%);
+    --gradient-danger: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    --gradient-success: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    
+    /* Experience Level Colors */
+    --elite-color: #ffd700;
+    --veteran-color: #4a9eff;
+    --regular-color: #28a745;
+    --green-color: #ffc107;
+    
+    /* Weight Class Colors */
+    --light-color: #17a2b8;
+    --medium-color: #28a745;
+    --heavy-color: #ffc107;
+    --assault-color: #dc3545;
+    
+    /* Faction Colors */
+    --steiner-color: #4a90e2;
+    --davion-color: #d32f2f;
+    --liao-color: #388e3c;
+    --marik-color: #7b1fa2;
+    --kurita-color: #e53935;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Roboto Mono', 'Courier New', monospace;
+    background: var(--primary-bg);
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(90, 163, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(52, 152, 219, 0.03) 0%, transparent 50%);
+    color: var(--primary-text);
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+#app {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Screen Management */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--primary-bg);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.screen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Enhanced Main Menu */
+#main-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#main-menu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(ellipse at center top, rgba(90, 163, 255, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse at center bottom, rgba(52, 152, 219, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.title h1 {
+    font-size: 4em;
+    font-weight: 900;
+    color: var(--highlight-text);
+    margin-bottom: 10px;
+    text-shadow: 
+        0 0 20px rgba(90, 163, 255, 0.6),
+        0 4px 8px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+    position: relative;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+.title h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 2px;
+    background: var(--gradient-accent);
+    border-radius: 1px;
+}
+
+.title h2 {
+    font-size: 1.8em;
+    color: var(--secondary-text);
+    font-weight: 300;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: 0.9;
+    margin-top: 20px;
+}
+
+@keyframes titleGlow {
+    0% {
+        text-shadow: 
+            0 0 20px rgba(90, 163, 255, 0.6),
+            0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+    100% {
+        text-shadow: 
+            0 0 30px rgba(90, 163, 255, 0.8),
+            0 0 40px rgba(90, 163, 255, 0.4),
+            0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.version {
+    text-align: center;
+    color: var(--secondary-text);
+    font-size: 0.9em;
+}
+
+/* Enhanced Button System */
+.btn {
+    background: var(--gradient-primary);
+    border: 2px solid var(--border-color);
+    color: var(--primary-text);
+    padding: 12px 24px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 200px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-highlight);
+    box-shadow: 0 4px 16px var(--focus-glow);
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.btn-primary {
+    background: var(--gradient-accent);
+    border-color: var(--accent-text);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary:hover {
+    background: var(--accent-text);
+    box-shadow: 0 6px 20px rgba(90, 163, 255, 0.4);
+}
+
+.btn-secondary {
+    background: var(--gradient-primary);
+    border-color: var(--border-accent);
+}
+
+.btn-danger {
+    background: var(--gradient-danger);
+    border-color: var(--danger-color);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.btn-danger:hover {
+    background: var(--danger-color);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 12px;
+    min-width: auto;
+    font-weight: 500;
+}
+
+/* Enhanced Layout System */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: var(--gradient-primary);
+    border-bottom: 3px solid var(--border-highlight);
+    box-shadow: 0 4px 12px var(--shadow-light);
+    position: relative;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--gradient-accent);
+}
+
+.header h2 {
+    color: var(--highlight-text);
+    text-transform: uppercase;
+    font-size: 1.5em;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.header h2::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: var(--accent-text);
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.main-content {
+    display: flex;
+    min-height: calc(100vh - 80px);
+}
+
+.left-panel, .right-panel {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.right-panel {
+    border-left: 2px solid var(--border-color);
+}
+
+/* Enhanced Information Cards */
+.info-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-accent);
+}
+
+.info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(90, 163, 255, 0.15);
+    border-color: var(--border-accent);
+}
+
+.info-card h3 {
+    color: var(--highlight-text);
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    font-size: 1.2em;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    position: relative;
+    padding-bottom: 8px;
+}
+
+.info-card h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 30px;
+    height: 2px;
+    background: var(--accent-text);
+    border-radius: 1px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.card-header h3 {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.card-header h3::after {
+    display: none;
+}
+
+/* Stats */
+.stat-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 4px 0;
+}
+
+.stat-line span:first-child {
+    color: var(--secondary-text);
+}
+
+.funds {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.expenses {
+    color: var(--danger-color);
+}
+
+.income {
+    color: var(--success-color);
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 15px 0;
+}
+
+/* Enhanced Lists */
+.pilot-list, .mech-list, .contract-list, .reputation-list {
+    max-height: 480px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.pilot-list::-webkit-scrollbar, .mech-list::-webkit-scrollbar, .contract-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.pilot-list::-webkit-scrollbar-track, .mech-list::-webkit-scrollbar-track, .contract-list::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+    border-radius: 4px;
+}
+
+.pilot-list::-webkit-scrollbar-thumb, .mech-list::-webkit-scrollbar-thumb, .contract-list::-webkit-scrollbar-thumb {
+    background: var(--border-accent);
+    border-radius: 4px;
+}
+
+.pilot-entry, .mech-entry, .contract-entry {
+    background: var(--panel-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    padding: 18px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pilot-entry::before, .mech-entry::before, .contract-entry::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.pilot-entry:hover, .mech-entry:hover, .contract-entry:hover {
+    border-color: var(--border-highlight);
+    box-shadow: 0 4px 16px rgba(90, 163, 255, 0.2);
+    transform: translateX(2px);
+}
+
+.pilot-entry:hover::before, .mech-entry:hover::before, .contract-entry:hover::before {
+    background: var(--accent-text);
+    width: 6px;
+}
+
+.pilot-entry.selected, .mech-entry.selected, .contract-entry.selected {
+    border-color: var(--border-highlight);
+    background: var(--accent-bg);
+    box-shadow: 0 6px 20px rgba(90, 163, 255, 0.3);
+    transform: translateX(4px);
+}
+
+.pilot-entry.selected::before, .mech-entry.selected::before, .contract-entry.selected::before {
+    background: var(--accent-text);
+    width: 6px;
+}
+
+.pilot-name, .mech-name, .contract-name {
+    font-weight: 700;
+    color: var(--highlight-text);
+    margin-bottom: 8px;
+    font-size: 1.1em;
+    letter-spacing: 0.3px;
+}
+
+.pilot-skills, .mech-status, .contract-summary {
+    font-size: 0.9em;
+    color: var(--secondary-text);
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.pilot-traits {
+    font-size: 0.85em;
+    color: var(--success-color);
+    font-weight: 500;
+}
+
+.difficulty-easy { color: var(--success-color); }
+.difficulty-moderate { color: var(--warning-color); }
+.difficulty-hard { color: #ff7f00; }
+.difficulty-extreme { color: var(--danger-color); }
+
+/* Enhanced Combat Styles */
+.combat-container {
+    display: flex;
+    height: calc(100vh - 80px);
+    background: var(--primary-bg);
+}
+
+.battlefield-panel {
+    flex: 2;
+    background: var(--secondary-bg);
+    border-right: 3px solid var(--border-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.battlefield-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 30% 20%, rgba(90, 163, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 70% 80%, rgba(52, 152, 219, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+#battlefield {
+    border: 3px solid var(--border-highlight);
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0a1428 0%, #0f1b35 100%);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+#battlefield::after {
+    content: 'TACTICAL DISPLAY';
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent-text);
+    font-size: 0.8em;
+    font-weight: 600;
+    letter-spacing: 2px;
+    opacity: 0.7;
+}
+
+.combat-ui {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    background: var(--card-bg);
+    border-left: 1px solid var(--border-accent);
+}
+
+.combat-log {
+    background: var(--primary-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    padding: 16px;
+    height: 240px;
+    overflow-y: auto;
+    font-size: 0.9em;
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.combat-log::before {
+    content: '>>> COMBAT LOG';
+    position: absolute;
+    top: -28px;
+    left: 0;
+    color: var(--accent-text);
+    font-size: 0.75em;
+    font-weight: 600;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+.combat-log::-webkit-scrollbar {
+    width: 8px;
+}
+
+.combat-log::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+    border-radius: 4px;
+}
+
+.combat-log::-webkit-scrollbar-thumb {
+    background: var(--border-accent);
+    border-radius: 4px;
+}
+
+.combat-log::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-text);
+}
+
+.log-entry {
+    margin-bottom: 6px;
+    color: var(--secondary-text);
+    line-height: 1.4;
+    padding: 2px 0;
+    border-left: 2px solid transparent;
+    padding-left: 8px;
+}
+
+.log-entry.important {
+    color: var(--highlight-text);
+    font-weight: bold;
+    border-left-color: var(--accent-text);
+    background: rgba(90, 163, 255, 0.05);
+}
+
+.log-entry.damage {
+    color: var(--danger-color);
+    border-left-color: var(--danger-color);
+    background: rgba(231, 76, 60, 0.05);
+}
+
+.log-entry.success {
+    color: var(--success-color);
+    border-left-color: var(--success-color);
+    background: rgba(46, 204, 113, 0.05);
+}
+
+/* Enhanced Progress Bars and Status Indicators */
+.progress-bar {
+    width: 100%;
+    height: 14px;
+    background: var(--primary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    margin: 8px 0;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent);
+    border-radius: 7px 7px 0 0;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border-radius: 6px;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+    border-radius: 6px 6px 0 0;
+}
+
+.health-bar { 
+    background: var(--gradient-success);
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.4);
+}
+
+.heat-bar { 
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    box-shadow: 0 0 8px rgba(243, 156, 18, 0.4);
+}
+
+.armor-bar { 
+    background: var(--gradient-accent);
+    box-shadow: 0 0 8px rgba(90, 163, 255, 0.4);
+}
+
+/* Status Indicators */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.status-operational {
+    background: rgba(46, 204, 113, 0.2);
+    color: var(--success-color);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.status-damaged {
+    background: rgba(243, 156, 18, 0.2);
+    color: var(--warning-color);
+    border: 1px solid rgba(243, 156, 18, 0.3);
+}
+
+.status-critical {
+    background: rgba(231, 76, 60, 0.2);
+    color: var(--danger-color);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.status-indicator::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Enhanced Responsive Design */
+@media (max-width: 1024px) {
+    .title h1 {
+        font-size: 3.5em;
+    }
+    
+    .title h2 {
+        font-size: 1.6em;
+    }
+    
+    .header {
+        padding: 16px 24px;
+    }
+    
+    .header h2 {
+        font-size: 1.3em;
+    }
+    
+    .info-card {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .title h1 {
+        font-size: 3em;
+        letter-spacing: 1px;
+    }
+    
+    .title h2 {
+        font-size: 1.4em;
+        letter-spacing: 2px;
+    }
+    
+    .main-content {
+        flex-direction: column;
+    }
+    
+    .right-panel {
+        border-left: none;
+        border-top: 3px solid var(--border-accent);
+    }
+    
+    .combat-container {
+        flex-direction: column;
+    }
+    
+    .battlefield-panel {
+        border-right: none;
+        border-bottom: 3px solid var(--border-accent);
+        min-height: 50vh;
+    }
+    
+    #battlefield {
+        width: 95%;
+        max-width: 600px;
+        height: 400px;
+    }
+    
+    .combat-ui {
+        padding: 16px;
+        max-height: 50vh;
+    }
+    
+    .header {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .nav-buttons {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .btn {
+        min-width: 120px;
+        font-size: 13px;
+        padding: 10px 20px;
+    }
+    
+    .btn-sm {
+        font-size: 11px;
+        padding: 6px 12px;
+    }
+    
+    .info-card {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .pilot-entry, .mech-entry, .contract-entry {
+        padding: 14px;
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .title h1 {
+        font-size: 2.5em;
+    }
+    
+    .title h2 {
+        font-size: 1.2em;
+        letter-spacing: 1px;
+    }
+    
+    .header h2 {
+        font-size: 1.1em;
+    }
+    
+    #battlefield {
+        height: 300px;
+    }
+    
+    .combat-log {
+        height: 180px;
+        padding: 12px;
+        font-size: 0.8em;
+    }
+    
+    .btn {
+        min-width: 100px;
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+    
+    .info-card h3 {
+        font-size: 1em;
+    }
+    
+    .pilot-name, .mech-name, .contract-name {
+        font-size: 1em;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.screen.active {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.text-success { color: var(--success-color); }
+.text-warning { color: var(--warning-color); }
+.text-danger { color: var(--danger-color); }
+.text-muted { color: var(--secondary-text); }
+
+/* Experience Level Classes */
+.text-elite { 
+    color: var(--elite-color); 
+    font-weight: bold;
+    text-shadow: 0 0 3px var(--elite-color);
+}
+.text-veteran { 
+    color: var(--veteran-color); 
+    font-weight: bold;
+}
+.text-regular { 
+    color: var(--regular-color); 
+}
+.text-green { 
+    color: var(--green-color); 
+}
+
+/* Weight Class Colors */
+.weight-light { 
+    color: var(--light-color); 
+    font-weight: bold;
+}
+.weight-medium { 
+    color: var(--medium-color); 
+    font-weight: bold;
+}
+.weight-heavy { 
+    color: var(--heavy-color); 
+    font-weight: bold;
+}
+.weight-assault { 
+    color: var(--assault-color); 
+    font-weight: bold;
+    text-shadow: 0 0 2px var(--assault-color);
+}
+
+/* Enhanced Pilot Display */
+.pilot-backstory {
+    font-size: 0.85em;
+    color: var(--secondary-text);
+    font-style: italic;
+    margin-top: 3px;
+}
+
+.pilot-traits {
+    font-size: 0.9em;
+    color: var(--accent-text);
+    margin-top: 2px;
+}
+
+/* Enhanced Mech Display */
+.mech-weapons {
+    font-size: 0.85em;
+    color: var(--secondary-text);
+    margin-top: 3px;
+}
+
+/* Enhanced Contract Display */
+.contract-description {
+    font-size: 0.9em;
+    color: var(--secondary-text);
+    margin-top: 5px;
+    line-height: 1.3;
+}
+
+.risk-factors {
+    font-size: 0.85em;
+    color: var(--warning-color);
+    margin-top: 3px;
+}
+
+.rep-effects {
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.rep-effects div {
+    margin: 2px 0;
+}
+
+/* Enhanced Faction System Styles */
+.faction-tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-left: 5px;
+}
+
+.faction-steiner {
+    background: var(--steiner-color);
+    color: white;
+}
+
+.faction-davion {
+    background: var(--davion-color);
+    color: white;
+}
+
+.faction-liao {
+    background: var(--liao-color);
+    color: white;
+}
+
+.faction-marik {
+    background: var(--marik-color);
+    color: white;
+}
+
+.faction-kurita {
+    background: var(--kurita-color);
+    color: white;
+}
+
+/* Additional Visual Enhancements */
+.funds {
+    position: relative;
+    font-weight: bold;
+    color: var(--success-color);
+}
+
+.funds::before {
+    content: '¢';
+    position: relative;
+    margin-right: 2px;
+    font-weight: normal;
+}
+
+.expenses {
+    color: var(--danger-color);
+    position: relative;
+}
+
+.expenses::before {
+    content: '−';
+    margin-right: 2px;
+    font-weight: bold;
+}
+
+.income {
+    color: var(--success-color);
+    position: relative;
+}
+
+.income::before {
+    content: '+';
+    margin-right: 2px;
+    font-weight: bold;
+}
+
+/* Enhanced Stat Lines */
+.stat-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(90, 163, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-line:hover {
+    background: rgba(90, 163, 255, 0.05);
+    border-bottom-color: rgba(90, 163, 255, 0.3);
+}
+
+.stat-line span:first-child {
+    color: var(--secondary-text);
+    font-weight: 500;
+}
+
+.stat-line span:last-child {
+    color: var(--primary-text);
+    font-weight: 600;
+}
+
+/* Loading States and Animations */
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 2s infinite;
+}
+
+/* Hover Effects for Interactive Elements */
+.clickable {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clickable:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(90, 163, 255, 0.2);
+}
+
+/* Version Display Enhancement */
+.version {
+    text-align: center;
+    color: var(--muted-text);
+    font-size: 0.9em;
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    padding: 8px 16px;
+    background: rgba(90, 163, 255, 0.05);
+    border: 1px solid rgba(90, 163, 255, 0.1);
+    border-radius: 16px;
+    display: inline-block;
+    letter-spacing: 0.5px;
+}
+
+/* Enhanced Menu Button Container */
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: center;
+    margin-bottom: 50px;
+    padding: 20px;
+}
+
+/* Focus States for Accessibility */
+.btn:focus,
+.info-card:focus,
+.pilot-entry:focus,
+.mech-entry:focus,
+.contract-entry:focus {
+    outline: 2px solid var(--accent-text);
+    outline-offset: 2px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-text: #ffffff;
+        --secondary-text: #ffffff;
+        --border-color: #ffffff;
+        --border-accent: #ffffff;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .btn::before {
+        display: none;
+    }
+    
+    .title h1 {
+        animation: none;
+    }
+}
+
+/* Reputation Level Styling */
+.reputation-list .stat-line {
+    align-items: center;
+}
+
+.mrbc-rating {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+    text-shadow: none;
+}
+
+.rep-warning {
+    color: var(--warning-color);
+    font-style: italic;
+}
+
+/* Political Context Styling */
+.political-context {
+    font-size: 0.85em;
+    color: var(--accent-text);
+    font-style: italic;
+    margin-top: 5px;
+    padding: 5px;
+    background: rgba(74, 158, 255, 0.1);
+    border-left: 2px solid var(--accent-text);
+}
+
+/* Enhanced Contract Display */
+.contract-entry {
+    border-left: 4px solid var(--border-color);
+}
+
+.contract-entry:hover {
+    border-left-color: var(--accent-text);
+}
+
+.contract-entry.faction-steiner {
+    border-left-color: var(--steiner-color);
+}
+
+.contract-entry.faction-davion {
+    border-left-color: var(--davion-color);
+}
+
+.contract-entry.faction-liao {
+    border-left-color: var(--liao-color);
+}
+
+.contract-entry.faction-marik {
+    border-left-color: var(--marik-color);
+}
+
+.contract-entry.faction-kurita {
+    border-left-color: var(--kurita-color);
+}
+
+/* Mercenary Unit Styling */
+.mercenary-unit-card {
+    background: var(--accent-bg);
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.mercenary-unit-rating {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.mercenary-unit-rating.rating-a {
+    background: var(--elite-color);
+    color: #000;
+}
+
+.mercenary-unit-rating.rating-b {
+    background: var(--veteran-color);
+    color: white;
+}
+
+.mercenary-unit-rating.rating-c {
+    background: var(--regular-color);
+    color: white;
+}
+
+.mercenary-unit-rating.rating-d {
+    background: var(--warning-color);
+    color: #000;
+}
+
+/* Inner Sphere Map Styling */
+.inner-sphere-world {
+    padding: 8px;
+    margin: 5px 0;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+}
+
+.world-type {
+    font-size: 0.8em;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.world-type.capital {
+    color: var(--elite-color);
+}
+
+.world-type.industrial {
+    color: var(--warning-color);
+}
+
+.world-type.military {
+    color: var(--danger-color);
+}
+
+/* Political Events Timeline */
+.political-events {
+    background: var(--primary-bg);
+    border: 1px solid var(--accent-text);
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.event-title {
+    color: var(--accent-text);
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.event-description {
+    font-size: 0.9em;
+    color: var(--secondary-text);
+    line-height: 1.4;
+}
+
+.event-impact {
+    font-size: 0.85em;
+    color: var(--warning-color);
+    font-style: italic;
+    margin-top: 5px;
+}
