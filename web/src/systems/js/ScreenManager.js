@@ -2,7 +2,7 @@
  * Screen Manager - Professional Screen/UI Management
  * Handles screen transitions, UI state, and component lifecycle
  */
-import { Logger } from '@utils/Logger';
+import { Logger } from '../../utils/Logger.js';
 
 export class ScreenManager {
   constructor(eventBus) {

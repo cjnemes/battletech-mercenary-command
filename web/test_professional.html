@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battletech Professional Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-status {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 10001;
+            border-radius: 4px;
+            max-width: 300px;
+        }
+        .test-pass { background-color: green !important; }
+        .test-fail { background-color: red !important; }
+    </style>
+</head>
+<body>
+    <!-- Test Status Panel -->
+    <div id="test-status" class="test-status">
+        <div>Professional System Test</div>
+        <div id="test-results">Loading...</div>
+    </div>
+
+    <div id="app">
+        <!-- Main Menu Screen -->
+        <div id="main-menu" class="screen active">
+            <div class="container">
+                <div class="title">
+                    <h1>BATTLETECH</h1>
+                    <h2>PROFESSIONAL TEST</h2>
+                </div>
+                
+                <div class="menu-buttons">
+                    <button class="btn btn-primary" onclick="startNewGame()">New Company</button>
+                    <button class="btn btn-secondary" onclick="loadGame()">Load Game</button>
+                    <button class="btn btn-secondary" onclick="showSettings()">Settings</button>
+                    <button class="btn btn-danger" onclick="quitGame()">Quit</button>
+                </div>
+                
+                <div class="version">Professional v0.2.0</div>
+            </div>
+        </div>
+
+        <!-- Company Overview Screen -->
+        <div id="company-overview" class="screen">
+            <div class="header">
+                <h2>Company Overview</h2>
+                <div class="nav-buttons">
+                    <button class="btn btn-sm" onclick="showMechBay()">Mech Bay</button>
+                    <button class="btn btn-sm" onclick="showStarMap()">Star Map</button>
+                    <button class="btn btn-sm" onclick="showMainMenu()">Back</button>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="left-panel">
+                    <div class="info-card">
+                        <h3>Company Status</h3>
+                        <div class="stat-line">
+                            <span>Company:</span>
+                            <span id="company-name">Wolf's Dragoons</span>
+                        </div>
+                        <div class="stat-line">
+                            <span>Funds:</span>
+                            <span id="company-funds" class="funds">500,000 C-Bills</span>
+                        </div>
+                        <div class="stat-line">
+                            <span>Rating:</span>
+                            <span id="company-rating">Green</span>
+                        </div>
+                        <div class="stat-line">
+                            <span>Date:</span>
+                            <span id="current-date">January 1, 3025</span>
+                        </div>
+                        <hr>
+                        <div class="stat-line">
+                            <span>Monthly Expenses:</span>
+                            <span id="monthly-expenses" class="expenses">45,000 C-Bills</span>
+                        </div>
+                        <div class="stat-line">
+                            <span>Monthly Income:</span>
+                            <span id="monthly-income" class="income">0 C-Bills</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="right-panel">
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h3>Personnel Roster</h3>
+                            <button class="btn btn-sm btn-primary" onclick="hirePilot()">Hire Pilot</button>
+                        </div>
+                        <div id="pilot-list" class="pilot-list">
+                            <!-- Pilots will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div id="pilot-details">
+                            <h3>Select a Pilot</h3>
+                            <p>Choose a pilot from the roster to view detailed information.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mech Bay Screen -->
+        <div id="mech-bay" class="screen">
+            <div class="header">
+                <h2>Mech Bay</h2>
+                <div class="nav-buttons">
+                    <button class="btn btn-sm" onclick="showCompanyOverview()">Back</button>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="left-panel">
+                    <div class="info-card">
+                        <h3>Mech Roster</h3>
+                        <div id="mech-list" class="mech-list">
+                            <!-- Mechs will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="right-panel">
+                    <div class="info-card">
+                        <div id="mech-details">
+                            <h3>Select a Mech</h3>
+                            <p>Choose a mech from the roster to view details and manage pilot assignments.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Star Map Screen -->
+        <div id="star-map" class="screen">
+            <div class="header">
+                <h2>Star Map - Available Contracts</h2>
+                <div class="nav-buttons">
+                    <button class="btn btn-sm" onclick="refreshContracts()">Refresh</button>
+                    <button class="btn btn-sm" onclick="advanceTime()">Advance Time (7 days)</button>
+                    <button class="btn btn-sm" onclick="showCompanyOverview()">Back</button>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="left-panel">
+                    <div class="info-card">
+                        <h3>Available Contracts</h3>
+                        <div id="contract-list" class="contract-list">
+                            <!-- Contracts will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="right-panel">
+                    <div class="info-card">
+                        <div id="contract-details">
+                            <h3>Select a Contract</h3>
+                            <p>Choose a contract from the list to view mission details and requirements.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { BattletechGame } from './game_professional.js';
+        
+        // Test runner
+        class TestRunner {
+            constructor() {
+                this.tests = [];
+                this.passed = 0;
+                this.failed = 0;
+            }
+            
+            addTest(name, testFunction) {
+                this.tests.push({ name, testFunction });
+            }
+            
+            async runTests() {
+                const resultsElement = document.getElementById('test-results');
+                resultsElement.innerHTML = 'Running tests...';
+                
+                for (const test of this.tests) {
+                    try {
+                        await test.testFunction();
+                        this.passed++;
+                        console.log(`✓ ${test.name}`);
+                    } catch (error) {
+                        this.failed++;
+                        console.error(`✗ ${test.name}:`, error);
+                    }
+                }
+                
+                const statusElement = document.getElementById('test-status');
+                if (this.failed === 0) {
+                    statusElement.classList.add('test-pass');
+                    resultsElement.innerHTML = `All tests passed! (${this.passed}/${this.tests.length})`;
+                } else {
+                    statusElement.classList.add('test-fail');
+                    resultsElement.innerHTML = `${this.failed} tests failed (${this.passed}/${this.tests.length} passed)`;
+                }
+            }
+        }
+        
+        // Initialize test runner
+        const testRunner = new TestRunner();
+        
+        // Test game initialization
+        testRunner.addTest('Game initializes without errors', async () => {
+            if (!window.gameApp) {
+                throw new Error('Game app not initialized');
+            }
+            
+            if (!window.gameApp.isInitialized) {
+                throw new Error('Game app not properly initialized');
+            }
+        });
+        
+        // Test backward compatibility functions exist
+        testRunner.addTest('Backward compatibility functions exist', async () => {
+            const requiredFunctions = [
+                'startNewGame',
+                'loadGame', 
+                'showSettings',
+                'quitGame',
+                'showScreen',
+                'showMainMenu',
+                'showCompanyOverview',
+                'showMechBay',
+                'showStarMap',
+                'selectPilot',
+                'selectMech',
+                'hirePilot',
+                'refreshContracts',
+                'advanceTime',
+                'updateAll'
+            ];
+            
+            for (const funcName of requiredFunctions) {
+                if (typeof window[funcName] !== 'function') {
+                    throw new Error(`Required function ${funcName} not found`);
+                }
+            }
+        });
+        
+        // Test New Game functionality
+        testRunner.addTest('New Game creates proper game state', async () => {
+            // Start new game
+            window.startNewGame();
+            
+            // Wait a moment for async operations
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const state = window.gameApp.getCurrentState();
+            
+            if (!state) {
+                throw new Error('No game state after starting new game');
+            }
+            
+            if (!state.pilots || state.pilots.length === 0) {
+                throw new Error('No pilots created');
+            }
+            
+            if (!state.mechs || state.mechs.length === 0) {
+                throw new Error('No mechs created');
+            }
+            
+            if (!state.contracts || state.contracts.length === 0) {
+                throw new Error('No contracts created');
+            }
+            
+            if (!state.company || !state.company.name) {
+                throw new Error('No company data created');
+            }
+        });
+        
+        // Test screen navigation
+        testRunner.addTest('Screen navigation works', async () => {
+            // Test navigation to each screen
+            const screens = ['company-overview', 'mech-bay', 'star-map', 'main-menu'];
+            
+            for (const screen of screens) {
+                window.showScreen(screen);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                const screenElement = document.getElementById(screen);
+                if (!screenElement.classList.contains('active')) {
+                    throw new Error(`Screen ${screen} not activated properly`);
+                }
+            }
+        });
+        
+        // Test UI updates
+        testRunner.addTest('UI elements update correctly', async () => {
+            // Start new game to populate data
+            window.startNewGame();
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Check company overview elements
+            window.showScreen('company-overview');
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const pilotList = document.getElementById('pilot-list');
+            if (!pilotList.innerHTML.trim()) {
+                throw new Error('Pilot list not populated');
+            }
+            
+            const companyFunds = document.getElementById('company-funds');
+            if (!companyFunds.textContent.includes('C-Bills')) {
+                throw new Error('Company funds not displayed correctly');
+            }
+            
+            // Check mech bay
+            window.showScreen('mech-bay');
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const mechList = document.getElementById('mech-list');
+            if (!mechList.innerHTML.trim()) {
+                throw new Error('Mech list not populated');
+            }
+            
+            // Check star map
+            window.showScreen('star-map');
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const contractList = document.getElementById('contract-list');
+            if (!contractList.innerHTML.trim()) {
+                throw new Error('Contract list not populated');
+            }
+        });
+        
+        // Run tests after game initializes
+        window.addEventListener('load', async () => {
+            // Wait for game to initialize
+            let attempts = 0;
+            while (!window.gameApp && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.gameApp) {
+                document.getElementById('test-results').innerHTML = 'Game failed to initialize';
+                document.getElementById('test-status').classList.add('test-fail');
+                return;
+            }
+            
+            // Wait a bit more for full initialization
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Run tests
+            await testRunner.runTests();
+        });
+    </script>
+</body>
+</html>

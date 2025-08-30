@@ -2,7 +2,7 @@
  * Game State - Centralized Game State Management
  * Manages the current game state with validation and change tracking
  */
-import { Logger } from '@utils/Logger';
+import { Logger } from '../../utils/Logger.js';
 
 export class GameState {
   constructor(eventBus) {

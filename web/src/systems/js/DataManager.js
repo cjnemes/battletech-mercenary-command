@@ -2,8 +2,8 @@
  * Data Manager - Professional Game Data Persistence
  * Handles save/load operations, data validation, and storage management
  */
-import { Logger } from '@utils/Logger';
-import { EventBus } from '@utils/EventBus';
+import { Logger } from '../../utils/Logger.js';
+import { EventBus } from '../../utils/EventBus.js';
 
 export class DataManager {
   constructor(eventBus) {

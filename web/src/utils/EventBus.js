@@ -7,7 +7,7 @@ export class EventBus {
     this.listeners = new Map();
     this.wildcardListeners = [];
     this.maxListeners = 100;
-    this.debug = process.env.NODE_ENV === 'development';
+    this.debug = (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'development') || false;
   }
 
   /**

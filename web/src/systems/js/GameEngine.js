@@ -2,17 +2,17 @@
  * Game Engine - Core Game System Orchestrator
  * Manages all game systems, state, and lifecycle
  */
-import { Logger } from '@utils/Logger';
-import { DataManager } from './DataManager';
-import { ScreenManager } from './ScreenManager';
-import { GameState } from './GameState';
+import { Logger } from '../../utils/Logger.js';
+import { DataManager } from './DataManager.js';
+import { ScreenManager } from './ScreenManager.js';
+import { GameState } from './GameState.js';
 
 // Import game systems
-import { CompanySystem } from './CompanySystem';
-import { PilotSystem } from './PilotSystem';
-import { MechSystem } from './MechSystem';
-import { ContractSystem } from './ContractSystem';
-import { CombatSystem } from './CombatSystem';
+import { CompanySystem } from './CompanySystem.js';
+import { PilotSystem } from './PilotSystem.js';
+import { MechSystem } from './MechSystem.js';
+import { ContractSystem } from './ContractSystem.js';
+import { CombatSystem } from './CombatSystem.js';
 
 export class GameEngine {
   constructor(eventBus) {
@@ -583,7 +583,7 @@ export class GameEngine {
    * Create debug panel for development
    */
   createDebugPanel() {
-    if (process.env.NODE_ENV !== 'development') return;
+    if (!(typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'development')) return;
     
     const panel = document.createElement('div');
     panel.id = 'debug-panel';
