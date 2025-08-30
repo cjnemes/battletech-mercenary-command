@@ -424,6 +424,322 @@ export class MechSystem {
   }
 
   /**
+   * Get available mechs for purchase based on market conditions
+   */
+  generateMechMarket() {
+    const database = this.getMechDatabase();
+    const allMechs = [...database.light, ...database.medium, ...database.heavy, ...database.assault];
+    const companyRating = this.gameState.get('company.rating') || 'Green';
+    const reputation = this.gameState.get('company.reputation') || {};
+    
+    // Filter mechs based on company rating and market availability
+    let availableMechs = allMechs.filter(mechData => {
+      const availability = this.getMechAvailability(mechData, companyRating, reputation);
+      return Math.random() < availability;
+    });
+
+    // Limit market size (5-10 mechs available at any time)
+    availableMechs = availableMechs.sort(() => Math.random() - 0.5).slice(0, Math.floor(Math.random() * 6) + 5);
+    
+    // Add market-specific data
+    availableMechs.forEach(mechData => {
+      mechData.id = this.generateMechId();
+      mechData.status = 'For Sale';
+      mechData.pilot = null;
+      mechData.armor = Math.floor(Math.random() * 40) + 60; // 60-100% armor
+      mechData.structure = Math.floor(Math.random() * 20) + 80; // 80-100% structure
+      mechData.heat = 0;
+      mechData.condition = this.determineMechCondition(mechData.armor, mechData.structure);
+      mechData.marketPrice = this.calculateMarketPrice(mechData);
+      mechData.lastMaintenance = Date.now() - (Math.floor(Math.random() * 90) * 24 * 60 * 60 * 1000); // 0-90 days ago
+      mechData.marketDeadline = Date.now() + (Math.floor(Math.random() * 21 + 7) * 24 * 60 * 60 * 1000); // 7-28 days
+      
+      // Initialize ammo based on weapons
+      mechData.ammo = this.generateAmmoLoadout(mechData.weapons);
+    });
+
+    return availableMechs;
+  }
+
+  /**
+   * Determine mech availability based on company status
+   */
+  getMechAvailability(mechData, companyRating, reputation) {
+    const baseAvailability = {
+      'Light': 0.8,
+      'Medium': 0.6,
+      'Heavy': 0.4,
+      'Assault': 0.2
+    };
+
+    let availability = baseAvailability[mechData.mechClass] || 0.5;
+    
+    // Higher rated companies have better access to rare mechs
+    if (companyRating === 'Elite') availability *= 1.5;
+    else if (companyRating === 'Veteran') availability *= 1.2;
+    else if (companyRating === 'Green') availability *= 0.8;
+    
+    return Math.min(availability, 0.9); // Cap at 90%
+  }
+
+  /**
+   * Determine mech condition based on armor and structure
+   */
+  determineMechCondition(armor, structure) {
+    const avgCondition = (armor + structure) / 2;
+    
+    if (avgCondition >= 95) return 'Excellent';
+    if (avgCondition >= 85) return 'Good';
+    if (avgCondition >= 70) return 'Fair';
+    if (avgCondition >= 50) return 'Poor';
+    return 'Salvage';
+  }
+
+  /**
+   * Calculate market price based on condition and demand
+   */
+  calculateMarketPrice(mechData) {
+    let basePrice = mechData.purchaseCost;
+    const avgCondition = (mechData.armor + mechData.structure) / 2;
+    
+    // Condition modifier
+    const conditionModifier = avgCondition / 100;
+    
+    // Market variance
+    const marketVariance = 0.8 + Math.random() * 0.4; // ±20%
+    
+    // Weight class demand modifier
+    const demandModifier = {
+      'Light': 0.9,    // Less demand
+      'Medium': 1.0,   // Standard demand
+      'Heavy': 1.1,    // Higher demand
+      'Assault': 1.2   // Premium demand
+    }[mechData.mechClass] || 1.0;
+    
+    return Math.round(basePrice * conditionModifier * marketVariance * demandModifier);
+  }
+
+  /**
+   * Generate ammo loadout based on weapons
+   */
+  generateAmmoLoadout(weaponsString) {
+    const ammo = {};
+    
+    // Parse weapons string to determine ammo needs
+    if (weaponsString.includes('AC/20')) ammo['AC/20'] = Math.floor(Math.random() * 10) + 10;
+    if (weaponsString.includes('AC/10')) ammo['AC/10'] = Math.floor(Math.random() * 15) + 15;
+    if (weaponsString.includes('AC/5')) ammo['AC/5'] = Math.floor(Math.random() * 15) + 15;
+    if (weaponsString.includes('AC/2')) ammo['AC/2'] = Math.floor(Math.random() * 20) + 25;
+    if (weaponsString.includes('LRM-20')) ammo['LRM-20'] = Math.floor(Math.random() * 8) + 8;
+    if (weaponsString.includes('LRM-15')) ammo['LRM-15'] = Math.floor(Math.random() * 12) + 12;
+    if (weaponsString.includes('LRM-10')) ammo['LRM-10'] = Math.floor(Math.random() * 15) + 15;
+    if (weaponsString.includes('LRM-5')) ammo['LRM-5'] = Math.floor(Math.random() * 20) + 20;
+    if (weaponsString.includes('SRM-6')) ammo['SRM-6'] = Math.floor(Math.random() * 10) + 10;
+    if (weaponsString.includes('SRM-4')) ammo['SRM-4'] = Math.floor(Math.random() * 15) + 15;
+    if (weaponsString.includes('SRM-2')) ammo['SRM-2'] = Math.floor(Math.random() * 25) + 25;
+    if (weaponsString.includes('Machine Gun')) ammo['Machine Gun'] = Math.floor(Math.random() * 100) + 100;
+    
+    return ammo;
+  }
+
+  /**
+   * Show mech market interface
+   */
+  showMechMarket() {
+    const availableMechs = this.generateMechMarket();
+    this.displayMechMarket(availableMechs);
+    this.eventBus.emit('mech:marketShown', { mechs: availableMechs });
+  }
+
+  /**
+   * Display the mech market interface
+   */
+  displayMechMarket(mechs) {
+    const marketHTML = `
+      <div id="mech-market-overlay" class="modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+        <div class="market-interface" style="background: #2a2a2a; border: 2px solid #555; border-radius: 8px; max-width: 90%; max-height: 90%; overflow-y: auto; padding: 20px; color: white;">
+          <div class="market-header">
+            <h2 style="color: #fff; margin-bottom: 10px;">Mech Market - Available Units</h2>
+            <p style="color: #ccc; margin-bottom: 20px;">Company Funds: ${this.gameState.get('company.funds', 0).toLocaleString()} C-Bills</p>
+            <button onclick="closeMechMarket()" style="float: right; background: #666; color: white; border: none; padding: 5px 10px; cursor: pointer;">Close</button>
+          </div>
+          <div class="mech-market-list">
+            ${mechs.map(mech => this.generateMechMarketCard(mech)).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', marketHTML);
+  }
+
+  /**
+   * Generate HTML card for mech market
+   */
+  generateMechMarketCard(mech) {
+    const companyFunds = this.gameState.get('company.funds') || 0;
+    const canAfford = companyFunds >= mech.marketPrice;
+    const daysRemaining = Math.ceil((mech.marketDeadline - Date.now()) / (24 * 60 * 60 * 1000));
+    
+    return `
+      <div class="mech-market-card" style="border: 1px solid #555; margin-bottom: 15px; padding: 15px; background: #333; border-radius: 5px;">
+        <div class="mech-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="color: #fff; margin: 0;">${mech.name}</h3>
+          <span class="weight-badge ${mech.mechClass.toLowerCase()}" style="padding: 3px 8px; border-radius: 3px; font-size: 12px; background: ${this.getWeightClassColor(mech.mechClass)};">${mech.mechClass}</span>
+        </div>
+        
+        <div class="mech-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div style="color: #ccc;">Tonnage: ${mech.tonnage}</div>
+          <div style="color: #ccc;">BV: ${mech.battleValue}</div>
+          <div style="color: #ccc;">Speed: ${mech.speed} kph</div>
+          <div style="color: #ccc;">Jump Jets: ${mech.jumpJets ? 'Yes' : 'No'}</div>
+          <div style="color: #ccc;">Condition: ${mech.condition}</div>
+          <div style="color: #ccc;">Monthly Maintenance: ${mech.maintenanceCost.toLocaleString()}</div>
+        </div>
+        
+        <div class="mech-details" style="margin-bottom: 10px;">
+          <div class="condition-bars" style="margin-bottom: 5px;">
+            <div style="display: flex; align-items: center; margin-bottom: 3px;">
+              <span style="width: 60px; font-size: 12px;">Armor:</span>
+              <div style="flex: 1; background: #444; height: 15px; border-radius: 3px; overflow: hidden;">
+                <div style="width: ${mech.armor}%; height: 100%; background: linear-gradient(90deg, #4a4, #aa4, #a44); transition: width 0.3s;"></div>
+              </div>
+              <span style="margin-left: 5px; font-size: 12px; width: 30px;">${mech.armor}%</span>
+            </div>
+            <div style="display: flex; align-items: center;">
+              <span style="width: 60px; font-size: 12px;">Structure:</span>
+              <div style="flex: 1; background: #444; height: 15px; border-radius: 3px; overflow: hidden;">
+                <div style="width: ${mech.structure}%; height: 100%; background: linear-gradient(90deg, #44a, #a4a, #a44); transition: width 0.3s;"></div>
+              </div>
+              <span style="margin-left: 5px; font-size: 12px; width: 30px;">${mech.structure}%</span>
+            </div>
+          </div>
+          <p style="color: #ddd; font-size: 14px; margin: 5px 0;"><strong>Weapons:</strong> ${mech.weapons}</p>
+          <p style="color: #ddd; font-size: 14px; margin: 5px 0;"><strong>Manufacturer:</strong> ${mech.manufacturer}</p>
+          <p style="color: #ddd; font-size: 13px; margin: 5px 0; font-style: italic;">${mech.description}</p>
+        </div>
+        
+        <div class="mech-purchase-actions" style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="purchase-info">
+            <div style="color: #${canAfford ? 'fff' : 'f44'}; font-weight: bold; font-size: 16px;">Price: ${mech.marketPrice.toLocaleString()} C-Bills</div>
+            <div style="color: #ccc; font-size: 12px;">Available for ${daysRemaining} more days</div>
+            <div style="color: #999; font-size: 11px;">Base Value: ${mech.purchaseCost.toLocaleString()} C-Bills</div>
+          </div>
+          <button 
+            onclick="purchaseMech('${mech.id}', ${mech.marketPrice})" 
+            style="background: ${canAfford ? '#4a4' : '#666'}; color: white; border: none; padding: 10px 20px; cursor: ${canAfford ? 'pointer' : 'not-allowed'}; border-radius: 3px; font-size: 14px;"
+            ${!canAfford ? 'disabled' : ''}
+          >
+            ${canAfford ? 'Purchase' : 'Insufficient Funds'}
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Get color for weight class
+   */
+  getWeightClassColor(weightClass) {
+    switch (weightClass) {
+      case 'Light': return '#4ecdc4';
+      case 'Medium': return '#45b7d1';
+      case 'Heavy': return '#f38ba8';
+      case 'Assault': return '#ff6b35';
+      default: return '#999';
+    }
+  }
+
+  /**
+   * Purchase a mech
+   */
+  purchaseMech(mechId, price) {
+    const companyFunds = this.gameState.get('company.funds') || 0;
+    
+    if (companyFunds < price) {
+      alert('Insufficient funds to purchase this mech.');
+      return;
+    }
+
+    // Find mech in market (this would normally be stored somewhere)
+    const availableMechs = this.generateMechMarket();
+    const mech = availableMechs.find(m => m.id === mechId);
+    
+    if (!mech) {
+      alert('Mech no longer available.');
+      return;
+    }
+
+    // Deduct purchase cost
+    this.gameState.set('company.funds', companyFunds - price);
+    
+    // Add mech to roster
+    const currentMechs = this.gameState.get('mechs') || [];
+    const newMech = {
+      ...mech,
+      id: this.generateMechId(),
+      status: mech.condition === 'Excellent' || mech.condition === 'Good' ? 'Ready' : 'Repair Needed',
+      pilot: null,
+      datePurchased: Date.now()
+    };
+    
+    currentMechs.push(newMech);
+    this.gameState.set('mechs', currentMechs);
+    
+    // Close market interface
+    this.closeMechMarket();
+    
+    this.eventBus.emit('mech:purchased', { mech: newMech, price });
+    this.logger.info(`Mech purchased: ${newMech.name} for ${price.toLocaleString()} C-Bills`);
+    
+    alert(`${newMech.name} has been purchased and added to your mech bay!\nCondition: ${newMech.condition}\nStatus: ${newMech.status}`);
+  }
+
+  /**
+   * Sell a mech
+   */
+  sellMech(mechId) {
+    const mech = this.getMechById(mechId);
+    if (!mech) {
+      alert('Mech not found.');
+      return;
+    }
+
+    if (mech.pilot) {
+      alert('Cannot sell mech while assigned to a pilot. Unassign pilot first.');
+      return;
+    }
+
+    const sellPrice = Math.round(mech.salvageValue * 0.8); // 80% of salvage value
+    
+    const confirmed = confirm(`Sell ${mech.name}?\n\nSale Price: ${sellPrice.toLocaleString()} C-Bills\n\nThis action cannot be undone.`);
+    
+    if (!confirmed) return;
+
+    // Add funds
+    const currentFunds = this.gameState.get('company.funds') || 0;
+    this.gameState.set('company.funds', currentFunds + sellPrice);
+    
+    // Remove mech from roster
+    this.gameState.removeFromArray('mechs', m => m.id === mechId);
+    
+    this.eventBus.emit('mech:sold', { mech, sellPrice });
+    this.logger.info(`Mech sold: ${mech.name} for ${sellPrice.toLocaleString()} C-Bills`);
+    
+    alert(`${mech.name} sold for ${sellPrice.toLocaleString()} C-Bills.`);
+  }
+
+  /**
+   * Close mech market interface
+   */
+  closeMechMarket() {
+    const overlay = document.getElementById('mech-market-overlay');
+    if (overlay) {
+      overlay.remove();
+    }
+  }
+
+  /**
    * Shutdown the mech system
    */
   async shutdown() {

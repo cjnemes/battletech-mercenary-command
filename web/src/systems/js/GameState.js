@@ -114,13 +114,24 @@ export class GameState {
         totalSpending: 0
       },
       
+      // Tutorial progress tracking
+      tutorialProgress: {},
+      hasPlayedBefore: false,
+      
       // Game settings (stored in state for save compatibility)
       settings: {
         autoSave: true,
         difficulty: 'normal',
         combatSpeed: 'normal',
         soundEnabled: true,
-        musicEnabled: true
+        musicEnabled: true,
+        tutorials: {
+          enableTutorials: true,
+          skipCompleted: true,
+          showHints: true,
+          animationSpeed: 'normal',
+          autoAdvance: false
+        }
       }
     };
     
@@ -158,7 +169,9 @@ export class GameState {
       pilots: { type: 'array', required: true },
       mechs: { type: 'array', required: true },
       contracts: { type: 'array', required: true },
-      statistics: { type: 'object', required: true }
+      statistics: { type: 'object', required: true },
+      tutorialProgress: { type: 'object', required: true },
+      hasPlayedBefore: { type: 'boolean', required: true }
     };
   }
 

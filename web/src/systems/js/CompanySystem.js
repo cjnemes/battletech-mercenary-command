@@ -65,6 +65,15 @@ export class CompanySystem {
     window.advanceTime = () => {
       this.eventBus.emit('company:advanceTime', { days: 7 });
     };
+    
+    // Make company management functions globally available
+    window.showCompanyOverview = () => {
+      this.showCompanyOverview();
+    };
+    
+    window.closeCompanyOverview = () => {
+      this.closeCompanyOverview();
+    };
   }
 
   /**
@@ -73,30 +82,363 @@ export class CompanySystem {
   initializeNewCompany() {
     const companyData = {
       name: "Wolf's Dragoons",
+      callsign: "Alpha Company",
+      established: Date.now(),
       funds: 500000,
       rating: 'Green',
-      reputation: {
-        'Steiner': 0,
-        'Davion': 0,
-        'Liao': 0,
-        'Marik': 0,
-        'Kurita': 0,
-        'Mercenary': 25
-      },
+      reputation: {}, // Will be initialized by FactionSystem
       expenses: {
         monthly: 45000,
         salaries: 0,
         maintenance: 0,
         insurance: 25000,
-        overhead: 20000
+        overhead: 20000,
+        miscellaneous: 0
       },
       income: {
         monthly: 0,
-        contracts: 0
+        contracts: 0,
+        investments: 0,
+        salvage: 0
+      },
+      statistics: {
+        contractsCompleted: 0,
+        contractsSuccessful: 0,
+        unitsDestroyed: 0,
+        pilotsLost: 0,
+        mechsLost: 0,
+        totalEarnings: 0,
+        totalExpenses: 0,
+        timeInService: 0
+      },
+      progression: {
+        experience: 0,
+        nextRatingThreshold: 1000,
+        specializations: [],
+        achievements: []
+      },
+      operations: {
+        currentLocation: 'Galatea',
+        operationalReadiness: 'Ready',
+        supplyLevel: 'Adequate',
+        moraleLevel: 'Good'
       }
     };
     
+    // Initialize time tracking
+    const timeData = {
+      year: 3025,
+      month: 1,
+      day: 1,
+      gameStartTime: Date.now(),
+      lastUpdate: Date.now()
+    };
+    
+    this.gameState.set('time', timeData);
+    
     return companyData;
+  }
+
+  /**
+   * Get company rating requirements and benefits
+   */
+  getRatingInfo() {
+    return {
+      'Green': {
+        experienceRequired: 0,
+        contractMultiplier: 0.8,
+        availableContracts: ['Garrison', 'Patrol', 'Escort', 'Training Exercise'],
+        description: 'New mercenary unit with basic training and limited experience',
+        benefits: ['Basic contract access', 'Standard payment rates']
+      },
+      'Regular': {
+        experienceRequired: 1000,
+        contractMultiplier: 1.0,
+        availableContracts: ['Garrison', 'Raid', 'Search and Destroy', 'Recon', 'Anti-Piracy'],
+        description: 'Competent mercenary unit with proven combat record',
+        benefits: ['Expanded contract types', 'Better faction access', 'Standard salvage rights']
+      },
+      'Veteran': {
+        experienceRequired: 3000,
+        contractMultiplier: 1.3,
+        availableContracts: ['Special Operations', 'Extraction', 'Sabotage', 'Deep Recon'],
+        description: 'Experienced unit capable of complex operations',
+        benefits: ['Elite contracts', '30% payment bonus', 'Priority contract selection']
+      },
+      'Elite': {
+        experienceRequired: 7500,
+        contractMultiplier: 1.6,
+        availableContracts: ['Black Ops', 'Assassination', 'Technology Theft', 'Regime Change'],
+        description: 'Legendary mercenary unit with unparalleled capabilities',
+        benefits: ['All contract types', '60% payment bonus', 'Faction influence', 'Exclusive opportunities']
+      }
+    };
+  }
+
+  /**
+   * Check and update company rating based on experience
+   */
+  updateCompanyRating() {
+    const company = this.gameState.get('company');
+    if (!company) return;
+    
+    const currentExperience = company.progression.experience;
+    const ratingInfo = this.getRatingInfo();
+    
+    let newRating = 'Green';
+    
+    if (currentExperience >= ratingInfo['Elite'].experienceRequired) {
+      newRating = 'Elite';
+    } else if (currentExperience >= ratingInfo['Veteran'].experienceRequired) {
+      newRating = 'Veteran';
+    } else if (currentExperience >= ratingInfo['Regular'].experienceRequired) {
+      newRating = 'Regular';
+    }
+    
+    if (newRating !== company.rating) {
+      const oldRating = company.rating;
+      company.rating = newRating;
+      company.progression.nextRatingThreshold = this.getNextRatingThreshold(newRating);
+      
+      this.gameState.set('company', company);
+      
+      this.eventBus.emit('company:ratingChanged', {
+        oldRating,
+        newRating,
+        experience: currentExperience
+      });
+      
+      this.logger.info(`Company rating upgraded: ${oldRating} -> ${newRating}`);
+      
+      // Show notification
+      const ratingDetails = ratingInfo[newRating];
+      alert(`COMPANY RATING UPGRADED!\n\n` +
+            `New Rating: ${newRating}\n` +
+            `${ratingDetails.description}\n\n` +
+            `Benefits:\n${ratingDetails.benefits.join('\n')}\n\n` +
+            `Payment Multiplier: ${(ratingDetails.contractMultiplier * 100)}%`);
+    }
+  }
+
+  /**
+   * Get next rating threshold
+   */
+  getNextRatingThreshold(currentRating) {
+    const ratingInfo = this.getRatingInfo();
+    const ratings = ['Green', 'Regular', 'Veteran', 'Elite'];
+    const currentIndex = ratings.indexOf(currentRating);
+    
+    if (currentIndex < ratings.length - 1) {
+      const nextRating = ratings[currentIndex + 1];
+      return ratingInfo[nextRating].experienceRequired;
+    }
+    
+    return null; // Max rating reached
+  }
+
+  /**
+   * Add experience points to the company
+   */
+  addExperience(amount, reason = '') {
+    const company = this.gameState.get('company');
+    if (!company) return;
+    
+    company.progression.experience += amount;
+    this.gameState.set('company', company);
+    
+    this.logger.info(`Experience gained: +${amount} (${reason})`);
+    this.updateCompanyRating();
+    
+    this.eventBus.emit('company:experienceGained', {
+      amount,
+      reason,
+      totalExperience: company.progression.experience
+    });
+  }
+
+  /**
+   * Calculate and update operational status
+   */
+  updateOperationalStatus() {
+    const company = this.gameState.get('company');
+    const pilots = this.gameState.get('pilots') || [];
+    const mechs = this.gameState.get('mechs') || [];
+    
+    if (!company) return;
+    
+    // Calculate operational readiness
+    const activePilots = pilots.filter(p => p.status === 'Active').length;
+    const readyMechs = mechs.filter(m => m.status === 'Ready').length;
+    const totalMechs = mechs.length;
+    
+    let readinessLevel = 'Not Ready';
+    const operationalUnits = Math.min(activePilots, readyMechs);
+    
+    if (operationalUnits >= 4) readinessLevel = 'Full Strength';
+    else if (operationalUnits >= 2) readinessLevel = 'Ready';
+    else if (operationalUnits >= 1) readinessLevel = 'Limited';
+    
+    // Calculate supply level based on funds
+    let supplyLevel = 'Critical';
+    const monthlyExpenses = this.calculateMonthlyExpenses();
+    const fundRatio = company.funds / monthlyExpenses;
+    
+    if (fundRatio >= 6) supplyLevel = 'Excellent';
+    else if (fundRatio >= 4) supplyLevel = 'Good';
+    else if (fundRatio >= 2) supplyLevel = 'Adequate';
+    else if (fundRatio >= 1) supplyLevel = 'Poor';
+    
+    // Calculate morale based on various factors
+    let moraleLevel = 'Good';
+    const successRate = company.statistics.contractsCompleted > 0 ? 
+      company.statistics.contractsSuccessful / company.statistics.contractsCompleted : 1;
+    
+    if (successRate >= 0.8 && supplyLevel !== 'Critical' && supplyLevel !== 'Poor') {
+      moraleLevel = 'Excellent';
+    } else if (successRate >= 0.6) {
+      moraleLevel = 'Good';
+    } else if (successRate >= 0.4) {
+      moraleLevel = 'Fair';
+    } else {
+      moraleLevel = 'Poor';
+    }
+    
+    // Update company status
+    company.operations = {
+      ...company.operations,
+      operationalReadiness: readinessLevel,
+      supplyLevel: supplyLevel,
+      moraleLevel: moraleLevel,
+      availableUnits: operationalUnits
+    };
+    
+    this.gameState.set('company', company);
+  }
+
+  /**
+   * Show detailed company overview
+   */
+  showCompanyOverview() {
+    const company = this.gameState.get('company');
+    const time = this.gameState.get('time');
+    const pilots = this.gameState.get('pilots') || [];
+    const mechs = this.gameState.get('mechs') || [];
+    
+    if (!company) return;
+    
+    const overviewHTML = this.generateCompanyOverviewHTML(company, time, pilots, mechs);
+    document.body.insertAdjacentHTML('beforeend', overviewHTML);
+  }
+
+  /**
+   * Generate comprehensive company overview HTML
+   */
+  generateCompanyOverviewHTML(company, time, pilots, mechs) {
+    const ratingInfo = this.getRatingInfo()[company.rating];
+    const monthlyExpenses = this.calculateMonthlyExpenses();
+    const monthsOfOperation = Math.floor(company.funds / monthlyExpenses);
+    
+    return `
+      <div id="company-overview-overlay" class="modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+        <div class="company-overview" style="background: #2a2a2a; border: 2px solid #555; border-radius: 8px; max-width: 95%; max-height: 95%; overflow-y: auto; padding: 20px; color: white;">
+          <div class="overview-header">
+            <h2 style="color: #fff; margin-bottom: 5px;">${company.name}</h2>
+            <p style="color: #ccc; margin-bottom: 15px;">${company.callsign} - ${company.rating} Rated Mercenary Unit</p>
+            <button onclick="closeCompanyOverview()" style="float: right; background: #666; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: -40px;">Close</button>
+          </div>
+          
+          <div class="overview-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+            <div class="left-column">
+              <div class="financial-status" style="background: #333; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                <h3 style="color: #4ecdc4; margin-bottom: 10px;">Financial Status</h3>
+                <div class="stat-line"><span>Available Funds:</span><span>${company.funds.toLocaleString()} C-Bills</span></div>
+                <div class="stat-line"><span>Monthly Expenses:</span><span>${monthlyExpenses.toLocaleString()} C-Bills</span></div>
+                <div class="stat-line"><span>Operating Reserve:</span><span>${monthsOfOperation} months</span></div>
+                <div class="stat-line"><span>Total Earnings:</span><span>${company.statistics.totalEarnings.toLocaleString()} C-Bills</span></div>
+              </div>
+              
+              <div class="unit-status" style="background: #333; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                <h3 style="color: #45b7d1; margin-bottom: 10px;">Unit Status</h3>
+                <div class="stat-line"><span>Readiness:</span><span>${company.operations.operationalReadiness}</span></div>
+                <div class="stat-line"><span>Supply Level:</span><span>${company.operations.supplyLevel}</span></div>
+                <div class="stat-line"><span>Morale:</span><span>${company.operations.moraleLevel}</span></div>
+                <div class="stat-line"><span>Location:</span><span>${company.operations.currentLocation}</span></div>
+                <div class="stat-line"><span>Available Units:</span><span>${company.operations.availableUnits}</span></div>
+              </div>
+              
+              <div class="force-composition" style="background: #333; padding: 15px; border-radius: 5px;">
+                <h3 style="color: #f38ba8; margin-bottom: 10px;">Force Composition</h3>
+                <div class="stat-line"><span>Total Pilots:</span><span>${pilots.length}</span></div>
+                <div class="stat-line"><span>Active Pilots:</span><span>${pilots.filter(p => p.status === 'Active').length}</span></div>
+                <div class="stat-line"><span>Total Mechs:</span><span>${mechs.length}</span></div>
+                <div class="stat-line"><span>Ready Mechs:</span><span>${mechs.filter(m => m.status === 'Ready').length}</span></div>
+                <div class="stat-line"><span>Under Repair:</span><span>${mechs.filter(m => m.status === 'Repairing').length}</span></div>
+              </div>
+            </div>
+            
+            <div class="right-column">
+              <div class="rating-progress" style="background: #333; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                <h3 style="color: #ff6b35; margin-bottom: 10px;">Rating & Progression</h3>
+                <div class="stat-line"><span>Current Rating:</span><span>${company.rating}</span></div>
+                <div class="stat-line"><span>Experience:</span><span>${company.progression.experience.toLocaleString()}</span></div>
+                ${company.progression.nextRatingThreshold ? 
+                  `<div class="progress-bar" style="margin: 10px 0;">
+                    <div style="background: #444; height: 20px; border-radius: 3px; overflow: hidden;">
+                      <div style="width: ${Math.min(100, (company.progression.experience / company.progression.nextRatingThreshold) * 100)}%; height: 100%; background: linear-gradient(90deg, #4ecdc4, #45b7d1); transition: width 0.3s;"></div>
+                    </div>
+                    <div style="font-size: 12px; color: #ccc; margin-top: 5px;">Progress to ${this.getNextRatingName(company.rating)}: ${Math.round((company.progression.experience / company.progression.nextRatingThreshold) * 100)}%</div>
+                  </div>` : 
+                  '<div style="color: #4ecdc4; margin: 10px 0;">Maximum Rating Achieved</div>'
+                }
+                <div style="font-size: 12px; color: #ccc; margin-top: 10px;">${ratingInfo.description}</div>
+              </div>
+              
+              <div class="combat-record" style="background: #333; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                <h3 style="color: #96ceb4; margin-bottom: 10px;">Combat Record</h3>
+                <div class="stat-line"><span>Contracts Completed:</span><span>${company.statistics.contractsCompleted}</span></div>
+                <div class="stat-line"><span>Success Rate:</span><span>${company.statistics.contractsCompleted > 0 ? Math.round((company.statistics.contractsSuccessful / company.statistics.contractsCompleted) * 100) : 0}%</span></div>
+                <div class="stat-line"><span>Units Destroyed:</span><span>${company.statistics.unitsDestroyed}</span></div>
+                <div class="stat-line"><span>Pilots Lost:</span><span>${company.statistics.pilotsLost}</span></div>
+                <div class="stat-line"><span>Mechs Lost:</span><span>${company.statistics.mechsLost}</span></div>
+              </div>
+              
+              <div class="time-service" style="background: #333; padding: 15px; border-radius: 5px;">
+                <h3 style="color: #ffd93d; margin-bottom: 10px;">Service Record</h3>
+                <div class="stat-line"><span>Established:</span><span>${new Date(company.established).toLocaleDateString()}</span></div>
+                <div class="stat-line"><span>Current Date:</span><span>${time.month}/${time.day}/${time.year}</span></div>
+                <div class="stat-line"><span>Time in Service:</span><span>${Math.floor((Date.now() - company.established) / (30 * 24 * 60 * 60 * 1000))} months</span></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="management-actions" style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+            <button onclick="showPilotHiring()" style="background: #4ecdc4; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 3px;">Hire Pilots</button>
+            <button onclick="showMechMarket()" style="background: #45b7d1; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 3px;">Mech Market</button>
+            <button onclick="showFactionOverview()" style="background: #f38ba8; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 3px;">Faction Standing</button>
+            <button onclick="advanceTime()" style="background: #ff6b35; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 3px;">Advance Time (+1 Week)</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Get next rating name
+   */
+  getNextRatingName(currentRating) {
+    const ratings = ['Green', 'Regular', 'Veteran', 'Elite'];
+    const currentIndex = ratings.indexOf(currentRating);
+    return currentIndex < ratings.length - 1 ? ratings[currentIndex + 1] : 'Elite';
+  }
+
+  /**
+   * Close company overview
+   */
+  closeCompanyOverview() {
+    const overlay = document.getElementById('company-overview-overlay');
+    if (overlay) {
+      overlay.remove();
+    }
   }
 
   /**

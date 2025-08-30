@@ -53,6 +53,9 @@ class BattletechApp {
       // Setup global event listeners
       this.setupGlobalEventListeners();
 
+      // Setup global tutorial system access
+      this.setupGlobalTutorialAccess();
+
       // Mark as initialized
       this.isInitialized = true;
       
@@ -193,6 +196,7 @@ class BattletechApp {
         break;
       case 'F1':
         this.eventBus.emit('keyboard:help');
+        this.showHelpMenu();
         event.preventDefault();
         break;
       case 'F5':
@@ -200,6 +204,78 @@ class BattletechApp {
         this.eventBus.emit('keyboard:refresh');
         break;
     }
+  }
+
+  /**
+   * Setup global tutorial system access
+   */
+  setupGlobalTutorialAccess() {
+    if (!window.TutorialSystem) {
+      window.TutorialSystem = {};
+    }
+    
+    // Make tutorial system globally accessible
+    window.TutorialSystem.instance = this.gameEngine?.getSystem('tutorial');
+    
+    // Add tutorial helper functions
+    window.TutorialSystem.start = (tutorialId, options) => {
+      return window.TutorialSystem.instance?.startTutorial(tutorialId, options);
+    };
+    
+    window.TutorialSystem.stop = () => {
+      return window.TutorialSystem.instance?.stopTutorial();
+    };
+    
+    window.TutorialSystem.skip = () => {
+      return window.TutorialSystem.instance?.skipTutorial();
+    };
+    
+    window.TutorialSystem.status = () => {
+      return window.TutorialSystem.instance?.getStatus();
+    };
+  }
+
+  /**
+   * Show help menu with available tutorials
+   */
+  showHelpMenu() {
+    const tutorialSystem = this.gameEngine?.getSystem('tutorial');
+    if (!tutorialSystem) return;
+
+    const statuses = tutorialSystem.getAllTutorialStatuses();
+    const tutorials = Object.entries(statuses);
+
+    if (tutorials.length === 0) {
+      window.NotificationSystem.instance.info(
+        'No tutorials are currently available. Tutorials will appear as you progress through the game.',
+        { title: 'Help System' }
+      );
+      return;
+    }
+
+    // Create help menu content
+    const tutorialList = tutorials.map(([id, status]) => {
+      const statusIcon = status.status === 'completed' ? '✓' : 
+                        status.status === 'started' ? '▶' : '○';
+      return `<li style="margin: 8px 0;">
+        ${statusIcon} <strong>${status.tutorial.title}</strong><br>
+        <small style="color: var(--secondary-text);">${status.tutorial.description}</small><br>
+        <button onclick="window.TutorialSystem.start('${id}', {force: true})" 
+                style="margin-top: 4px; padding: 4px 8px; font-size: 11px;">
+          ${status.status === 'completed' ? 'Replay' : 'Start'}
+        </button>
+      </li>`;
+    }).join('');
+
+    window.NotificationSystem.instance.show(
+      `<ul style="list-style: none; padding: 0; margin: 10px 0;">${tutorialList}</ul>`,
+      {
+        title: 'Available Tutorials',
+        type: 'info',
+        autoDismiss: false,
+        duration: 10000
+      }
+    );
   }
 
   /**

@@ -2,9 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=0.5, user-scalable=yes, viewport-fit=cover">
     <title>Battletech Mercenary Command</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Battletech Command">
+    <meta name="theme-color" content="#0c0f1a">
+    <meta name="msapplication-navbutton-color" content="#0c0f1a">
+    <meta name="msapplication-TileColor" content="#0c0f1a">
+    
+    <!-- SEO and Social Meta Tags -->
+    <meta name="description" content="Professional Battletech Mercenary Command game with immersive audio and mobile-optimized gameplay">
+    <meta name="keywords" content="battletech, mercenary, mech, strategy, tactical, sci-fi">
+    <meta name="author" content="Battletech Command Team">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Battletech Mercenary Command">
+    <meta property="og:description" content="Lead your mercenary company in the Battletech universe">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/web/src/assets/images/og-image.png">
+    
+    <!-- Touch Icons and Favicons -->
+    <link rel="icon" type="image/x-icon" href="/web/src/assets/images/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/web/src/assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/web/src/assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/web/src/assets/images/favicon-16x16.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/web/manifest.json">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- DNS Prefetch for Performance -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/web/src/assets/audio/ui/button-click.wav" as="audio">
+    <link rel="preload" href="/web/src/systems/js/GameEngine.js" as="script">
+    <link rel="preload" href="/web/src/systems/js/AudioManager.js" as="script">
+    <link rel="preload" href="/web/src/systems/js/MobileOptimizer.js" as="script">
 </head>
 <body>
     <div id="app">
@@ -17,8 +57,8 @@
                 </div>
                 
                 <div class="menu-buttons">
-                    <button class="btn btn-primary" onclick="startNewGame()">New Company</button>
-                    <button class="btn btn-secondary" onclick="loadGame()">Load Game</button>
+                    <button id="new-company-btn" class="btn btn-primary" onclick="startNewGame()">New Company</button>
+                    <button id="load-game-btn" class="btn btn-secondary" onclick="loadGame()">Load Game</button>
                     <button class="btn btn-secondary" onclick="showSettings()">Settings</button>
                     <button class="btn btn-danger" onclick="quitGame()">Quit</button>
                 </div>
@@ -32,15 +72,15 @@
             <div class="header">
                 <h2>Company Overview</h2>
                 <div class="nav-buttons">
-                    <button class="btn btn-sm" onclick="showMechBay()">Mech Bay</button>
-                    <button class="btn btn-sm" onclick="showStarMap()">Star Map</button>
+                    <button id="mech-bay-btn" class="btn btn-sm" onclick="showMechBay()">Mech Bay</button>
+                    <button id="star-map-btn" class="btn btn-sm" onclick="showStarMap()">Star Map</button>
                     <button class="btn btn-sm" onclick="showMainMenu()">Back</button>
                 </div>
             </div>
             
             <div class="main-content">
                 <div class="left-panel">
-                    <div class="info-card">
+                    <div class="info-card company-stats">
                         <h3>Company Status</h3>
                         <div class="stat-line">
                             <span>Company:</span>
@@ -48,7 +88,7 @@
                         </div>
                         <div class="stat-line">
                             <span>Funds:</span>
-                            <span id="company-funds" class="funds">500,000 C-Bills</span>
+                            <span id="company-funds" class="funds funds-display">500,000 C-Bills</span>
                         </div>
                         <div class="stat-line">
                             <span>Rating:</span>
@@ -82,7 +122,7 @@
                     </div>
                     
                     <div class="info-card">
-                        <div id="pilot-details">
+                        <div id="pilot-details" class="pilot-details">
                             <h3>Select a Pilot</h3>
                             <p>Choose a pilot from the roster to view detailed information.</p>
                         </div>
@@ -90,7 +130,7 @@
                     
                     <div class="info-card">
                         <h3>Faction Reputation</h3>
-                        <div id="reputation-list" class="reputation-list">
+                        <div id="reputation-list" class="reputation-list reputation-display">
                             <!-- Reputation will be populated here -->
                         </div>
                     </div>
@@ -130,7 +170,7 @@
                 
                 <div class="right-panel">
                     <div class="info-card">
-                        <div id="mech-details">
+                        <div id="mech-details" class="mech-details">
                             <h3>Select a Mech</h3>
                             <p>Choose a mech from the roster to view details and manage pilot assignments.</p>
                         </div>
@@ -162,7 +202,7 @@
                 
                 <div class="right-panel">
                     <div class="info-card">
-                        <div id="contract-details">
+                        <div id="contract-details" class="contract-details">
                             <h3>Select a Contract</h3>
                             <p>Choose a contract from the list to view mission details and requirements.</p>
                         </div>
@@ -216,6 +256,102 @@
             </div>
         </div>
     </div>
+
+    <!-- Service Worker Registration -->
+    <script>
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/web/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                        
+                        // Listen for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New content available, prompt user
+                                    if (confirm('New version available! Reload to update?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.log('SW registration failed: ', error);
+                    });
+                    
+                // Listen for messages from service worker
+                navigator.serviceWorker.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'CACHE_CLEARED') {
+                        console.log('Service worker cache cleared');
+                    }
+                });
+            });
+        }
+        
+        // Install prompt handling
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show custom install button or banner
+            const installBanner = document.createElement('div');
+            installBanner.innerHTML = `
+                <div style="position: fixed; bottom: 20px; left: 20px; right: 20px; background: var(--card-bg); 
+                           border: 2px solid var(--border-highlight); border-radius: 8px; padding: 15px; 
+                           z-index: 10000; text-align: center;">
+                    <p style="margin-bottom: 10px; color: var(--primary-text);">Install Battletech Command for a better experience!</p>
+                    <button onclick="installApp()" style="margin-right: 10px;" class="btn btn-primary">Install</button>
+                    <button onclick="dismissInstall()" class="btn btn-secondary">Not Now</button>
+                </div>
+            `;
+            document.body.appendChild(installBanner);
+            
+            window.installApp = () => {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                    installBanner.remove();
+                });
+            };
+            
+            window.dismissInstall = () => {
+                installBanner.remove();
+                deferredPrompt = null;
+            };
+        });
+        
+        // Handle app installed event
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('App was installed successfully');
+        });
+        
+        // Prevent iOS bounce scrolling
+        document.addEventListener('touchmove', (e) => {
+            if (e.target.closest('.scrollable, input, textarea, select') === null) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Handle mobile viewport height changes
+        const setVH = () => {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        };
+        
+        setVH();
+        window.addEventListener('resize', setVH);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(setVH, 500);
+        });
+    </script>
 
     <script type="module" src="game_professional.js"></script>
 </body>

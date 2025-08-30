@@ -60,6 +60,7 @@ class BattletechGame {
       this.contractSystem = this.gameEngine.getSystem('contract');
       this.companySystem = this.gameEngine.getSystem('company');
       this.combatSystem = this.gameEngine.getSystem('combat');
+      this.factionSystem = this.gameEngine.getSystem('faction');
       
       // Setup backward compatibility functions
       this.setupBackwardCompatibility();
@@ -125,9 +126,26 @@ class BattletechGame {
       this.eventBus.emit('screen:show', 'star-map');
     };
     
+    window.showFactionOverview = () => {
+      this.eventBus.emit('screen:show', 'faction-overview');
+    };
+    
     // Update function for backward compatibility
     window.updateAll = () => {
       this.updateAll();
+    };
+    
+    // Company management functions
+    window.showPilotHiring = () => {
+      if (this.pilotSystem) this.pilotSystem.showPilotHiring();
+    };
+    
+    window.showMechMarket = () => {
+      if (this.mechSystem) this.mechSystem.showMechMarket();
+    };
+    
+    window.showFactionOverview = () => {
+      if (this.factionSystem) this.factionSystem.showFactionOverview();
     };
     
     this.logger.debug('Backward compatibility functions setup complete');

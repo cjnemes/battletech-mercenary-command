@@ -1,0 +1,131 @@
+{
+  "name": "Battletech Mercenary Command",
+  "short_name": "Battletech Command",
+  "description": "Lead your mercenary company in the Battletech universe with immersive audio and mobile-optimized gameplay",
+  "start_url": "/web/index.html",
+  "scope": "/web/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#0c0f1a",
+  "background_color": "#0c0f1a",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["games", "entertainment", "strategy"],
+  "screenshots": [
+    {
+      "src": "/web/src/assets/images/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Main game interface showing company overview and mech management"
+    },
+    {
+      "src": "/web/src/assets/images/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile-optimized interface with touch controls"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/web/src/assets/images/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/web/src/assets/images/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/web/src/assets/images/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/web/src/assets/images/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/web/src/assets/images/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/web/src/assets/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/web/src/assets/images/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/web/src/assets/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Company",
+      "short_name": "New Game",
+      "description": "Start a new mercenary company",
+      "url": "/web/index.html?action=new-game",
+      "icons": [
+        {
+          "src": "/web/src/assets/images/shortcut-new-game.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Load Game",
+      "short_name": "Continue",
+      "description": "Load an existing company save",
+      "url": "/web/index.html?action=load-game",
+      "icons": [
+        {
+          "src": "/web/src/assets/images/shortcut-load-game.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "description": "Configure audio and mobile settings",
+      "url": "/web/index.html?action=settings",
+      "icons": [
+        {
+          "src": "/web/src/assets/images/shortcut-settings.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": ["focus-existing", "auto"]
+  },
+  "handle_links": "preferred",
+  "capture_links": "existing-client-navigate"
+}

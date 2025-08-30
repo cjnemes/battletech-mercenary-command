@@ -13,6 +13,10 @@ import { PilotSystem } from './PilotSystem.js';
 import { MechSystem } from './MechSystem.js';
 import { ContractSystem } from './ContractSystem.js';
 import { CombatSystem } from './CombatSystem.js';
+import { FactionSystem } from './FactionSystem.js';
+import { TutorialSystem } from './TutorialSystem.js';
+import { AudioManager } from './AudioManager.js';
+import { MobileOptimizer } from './MobileOptimizer.js';
 
 export class GameEngine {
   constructor(eventBus) {
@@ -26,6 +30,8 @@ export class GameEngine {
     this.dataManager = null;
     this.screenManager = null;
     this.gameState = null;
+    this.audioManager = null;
+    this.mobileOptimizer = null;
     
     // Game systems
     this.systems = new Map();
@@ -96,6 +102,14 @@ export class GameEngine {
     this.gameState = new GameState(this.eventBus);
     await this.gameState.initialize();
     
+    // Initialize audio manager
+    this.audioManager = new AudioManager(this.eventBus);
+    await this.audioManager.initialize();
+    
+    // Initialize mobile optimizer
+    this.mobileOptimizer = new MobileOptimizer(this.eventBus);
+    await this.mobileOptimizer.initialize();
+    
     this.logger.info('Core systems initialized');
   }
 
@@ -104,11 +118,13 @@ export class GameEngine {
    */
   async initializeGameSystems() {
     const systemConfigs = [
+      { name: 'tutorial', class: TutorialSystem, priority: 0 }, // Initialize first for early access
       { name: 'company', class: CompanySystem, priority: 1 },
-      { name: 'pilot', class: PilotSystem, priority: 2 },
-      { name: 'mech', class: MechSystem, priority: 3 },
-      { name: 'contract', class: ContractSystem, priority: 4 },
-      { name: 'combat', class: CombatSystem, priority: 5 }
+      { name: 'faction', class: FactionSystem, priority: 2 },
+      { name: 'pilot', class: PilotSystem, priority: 3 },
+      { name: 'mech', class: MechSystem, priority: 4 },
+      { name: 'contract', class: ContractSystem, priority: 5 },
+      { name: 'combat', class: CombatSystem, priority: 6 }
     ];
     
     // Sort by priority
@@ -664,6 +680,14 @@ export class GameEngine {
       }
       
       // Shutdown core systems
+      if (this.mobileOptimizer) {
+        await this.mobileOptimizer.shutdown();
+      }
+      
+      if (this.audioManager) {
+        await this.audioManager.shutdown();
+      }
+      
       if (this.gameState) {
         await this.gameState.shutdown();
       }
