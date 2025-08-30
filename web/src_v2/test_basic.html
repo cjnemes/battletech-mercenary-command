@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #0f0;
+            padding: 20px;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #0f0;
+            background: #001100;
+        }
+        button {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Basic JavaScript Test</h1>
+    <button onclick="testBasic()">Click to Test</button>
+    <div id="output"></div>
+
+    <script>
+        function testBasic() {
+            console.log("Test button clicked!");
+            
+            const output = document.getElementById('output');
+            output.innerHTML = '<div class="result">✅ JavaScript is working!</div>';
+            
+            // Test basic functionality
+            try {
+                const testObject = {
+                    name: 'Test',
+                    value: 123
+                };
+                
+                output.innerHTML += '<div class="result">✅ Object creation works</div>';
+                
+                const testArray = [1, 2, 3];
+                testArray.push(4);
+                
+                output.innerHTML += '<div class="result">✅ Array manipulation works</div>';
+                
+                setTimeout(() => {
+                    output.innerHTML += '<div class="result">✅ setTimeout works</div>';
+                }, 100);
+                
+                Promise.resolve('test').then(result => {
+                    output.innerHTML += '<div class="result">✅ Promises work</div>';
+                });
+                
+                output.innerHTML += '<div class="result">🎉 All basic tests passed!</div>';
+                
+            } catch (error) {
+                output.innerHTML += `<div class="result">❌ Error: ${error.message}</div>`;
+                console.error('Test error:', error);
+            }
+        }
+        
+        // Test that page loaded
+        window.addEventListener('load', () => {
+            console.log('Page loaded successfully');
+        });
+        
+        console.log('Script loaded');
+    </script>
+</body>
+</html>

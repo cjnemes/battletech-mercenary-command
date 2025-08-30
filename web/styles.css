@@ -941,6 +941,20 @@ hr {
     color: var(--green-color); 
 }
 
+/* Contract Actions */
+.contract-actions {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+.contract-actions .btn {
+    min-width: 150px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
 /* Weight Class Colors */
 .weight-light { 
     color: var(--light-color); 
@@ -2536,4 +2550,250 @@ textarea:focus {
     .screen {
         padding-top: calc(var(--mobile-header-height) + var(--safe-area-inset-top));
     }
+}
+
+/* ===== ENHANCED UI STYLES - BULLETPROOF V2 ===== */
+
+/* Selection states */
+.pilot-item, .mech-item, .contract-item {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.pilot-item:hover, .mech-item:hover, .contract-item:hover {
+    border-color: var(--border-highlight);
+    background: rgba(90, 163, 255, 0.1);
+}
+
+.pilot-item.selected, .mech-item.selected, .contract-item.selected {
+    border-color: var(--accent-color) !important;
+    background: rgba(90, 163, 255, 0.2) !important;
+    box-shadow: 0 0 10px rgba(90, 163, 255, 0.3);
+}
+
+/* Enhanced pilot items */
+.pilot-item {
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 6px;
+    background: var(--card-bg);
+}
+
+.pilot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.pilot-name {
+    font-weight: bold;
+    color: var(--primary-text);
+    font-size: 14px;
+}
+
+.pilot-experience {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.pilot-experience.elite { background: #ff6b35; color: #000; }
+.pilot-experience.veteran { background: #4ecdc4; color: #000; }
+.pilot-experience.regular { background: #45b7d1; color: #000; }
+.pilot-experience.green { background: #96ceb4; color: #000; }
+
+.pilot-stats {
+    display: flex;
+    gap: 12px;
+    margin: 6px 0;
+    font-size: 12px;
+}
+
+.pilot-stats .stat {
+    color: var(--secondary-text);
+}
+
+.pilot-salary {
+    color: var(--success-color);
+    font-size: 11px;
+    font-style: italic;
+}
+
+/* Enhanced mech items */
+.mech-item {
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 6px;
+    background: var(--card-bg);
+}
+
+.mech-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.mech-name {
+    font-weight: bold;
+    color: var(--primary-text);
+    font-size: 14px;
+}
+
+.mech-weight-class {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.mech-weight-class.light { background: #96ceb4; color: #000; }
+.mech-weight-class.medium { background: #45b7d1; color: #000; }
+.mech-weight-class.heavy { background: #f7d794; color: #000; }
+.mech-weight-class.assault { background: #ff6b6b; color: #fff; }
+
+.mech-stats {
+    display: flex;
+    gap: 12px;
+    margin: 6px 0;
+    font-size: 12px;
+}
+
+.mech-stats .stat {
+    color: var(--secondary-text);
+}
+
+.mech-stats .excellent { color: #4ecdc4; }
+.mech-stats .good { color: #96ceb4; }
+.mech-stats .fair { color: #f7d794; }
+.mech-stats .poor { color: #ff6b6b; }
+
+.mech-pilot-assignment {
+    font-size: 11px;
+    margin-top: 6px;
+    color: var(--secondary-text);
+}
+
+.mech-pilot-assignment .assigned { color: var(--success-color); }
+.mech-pilot-assignment .unassigned { color: var(--secondary-text); font-style: italic; }
+
+/* Enhanced contract items */
+.contract-item {
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 6px;
+    background: var(--card-bg);
+    border-left: 4px solid var(--border-color);
+}
+
+.contract-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.contract-title {
+    font-weight: bold;
+    color: var(--primary-text);
+    font-size: 14px;
+}
+
+.contract-difficulty {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.contract-difficulty.easy { background: #96ceb4; color: #000; }
+.contract-difficulty.medium { background: #f7d794; color: #000; }
+.contract-difficulty.hard { background: #ff6b6b; color: #fff; }
+
+.contract-employer {
+    color: var(--secondary-text);
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.contract-details {
+    display: flex;
+    gap: 15px;
+    margin: 8px 0;
+    font-size: 12px;
+    flex-wrap: wrap;
+}
+
+.contract-payment {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.contract-duration, .contract-salvage {
+    color: var(--secondary-text);
+}
+
+.contract-description {
+    font-size: 11px;
+    color: var(--secondary-text);
+    line-height: 1.4;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* Fix Inner Sphere Intel height issue */
+.political-intel {
+    max-height: 120px !important;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.political-intel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.political-intel::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+    border-radius: 3px;
+}
+
+.political-intel::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.political-intel::-webkit-scrollbar-thumb:hover {
+    background: var(--border-accent);
+}
+
+.political-events {
+    padding: 10px 0;
+}
+
+.event-title {
+    font-weight: bold;
+    color: var(--primary-text);
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.event-description {
+    font-size: 12px;
+    line-height: 1.4;
+    margin-bottom: 5px;
+    color: var(--secondary-text);
+}
+
+.event-impact {
+    font-size: 11px;
+    font-style: italic;
+    color: var(--accent-color);
+    border-top: 1px solid var(--border-color);
+    padding-top: 5px;
+    margin-top: 5px;
 }

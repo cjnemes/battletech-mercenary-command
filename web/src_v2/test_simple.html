@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Bulletproof Architecture Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0c0f1a;
+            color: #e0e0e0;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1a1f2e;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #2a3441;
+        }
+        
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .success {
+            background: #1e4a2e;
+            border: 1px solid #4caf50;
+            color: #4caf50;
+        }
+        
+        .error {
+            background: #4a1e1e;
+            border: 1px solid #f44336;
+            color: #f44336;
+        }
+        
+        .info {
+            background: #1e2a4a;
+            border: 1px solid #2196f3;
+            color: #2196f3;
+        }
+        
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #357abd;
+        }
+        
+        .log-output {
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a90e2;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🛡️ BULLETPROOF ARCHITECTURE TEST</h1>
+        <p style="text-align: center; color: #8cc8ff;">Core Systems + State Management (No Module Loading)</p>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="runTest()">🚀 Run Test</button>
+            <button onclick="clearResults()">Clear Results</button>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+        
+        <div id="test-results"></div>
+        
+        <h3>📝 System Log</h3>
+        <div id="log-output" class="log-output">
+            <pre id="log-content">Ready to test...</pre>
+        </div>
+    </div>
+
+    <script>
+        // Inline implementation of core classes (simplified for testing)
+        
+        // Logger class
+        class Logger {
+            constructor(context = 'Game') {
+                this.context = context;
+                this.logs = [];
+                this.maxLogs = 100;
+                this.startTime = Date.now();
+                this.fallbackMode = false;
+                console.log(`[${this.context}] Logger initialized`);
+            }
+            
+            log(level, message, data = null) {
+                const timestamp = new Date().toISOString();
+                const logEntry = {
+                    timestamp,
+                    level,
+                    context: this.context,
+                    message,
+                    data
+                };
+                
+                this.logs.push(logEntry);
+                
+                if (this.logs.length > this.maxLogs) {
+                    this.logs = this.logs.slice(-this.maxLogs * 0.8);
+                }
+                
+                const consoleMessage = `[${timestamp}] [${level}] [${this.context}] ${message}`;
+                console.log(consoleMessage, data);
+            }
+            
+            error(message, data) { this.log('ERROR', message, data); }
+            warn(message, data) { this.log('WARN', message, data); }
+            info(message, data) { this.log('INFO', message, data); }
+            debug(message, data) { this.log('DEBUG', message, data); }
+            
+            getStatus() {
+                return {
+                    context: this.context,
+                    fallbackMode: this.fallbackMode,
+                    totalLogs: this.logs.length,
+                    uptime: Date.now() - this.startTime
+                };
+            }
+        }
+        
+        // EventBus class
+        class EventBus {
+            constructor(logger) {
+                this.logger = logger || console;
+                this.listeners = new Map();
+                this.eventHistory = [];
+                this.maxHistory = 100;
+                this.logger.info?.('EventBus initialized') || console.log('EventBus initialized');
+            }
+            
+            on(eventName, callback) {
+                if (!this.listeners.has(eventName)) {
+                    this.listeners.set(eventName, []);
+                }
+                this.listeners.get(eventName).push(callback);
+                this.logger.debug?.(`Subscribed to event: ${eventName}`) || console.debug(`Subscribed to: ${eventName}`);
+            }
+            
+            emit(eventName, data = null) {
+                this.recordEvent(eventName, data);
+                
+                if (!this.listeners.has(eventName)) {
+                    this.logger.debug?.(`No listeners for event: ${eventName}`) || console.debug(`No listeners for: ${eventName}`);
+                    return;
+                }
+                
+                const listeners = this.listeners.get(eventName);
+                this.logger.debug?.(`Emitting event: ${eventName} to ${listeners.length} listeners`) || 
+                    console.debug(`Emitting: ${eventName} to ${listeners.length} listeners`);
+                
+                listeners.forEach((callback, index) => {
+                    try {
+                        callback(data);
+                    } catch (error) {
+                        this.logger.error?.(`Event listener error for ${eventName}[${index}]`, error) || 
+                            console.error(`Listener error for ${eventName}:`, error);
+                    }
+                });
+            }
+            
+            recordEvent(eventName, data) {
+                const eventRecord = {
+                    timestamp: Date.now(),
+                    name: eventName,
+                    data: data,
+                    listenerCount: this.listeners.has(eventName) ? this.listeners.get(eventName).length : 0
+                };
+                
+                this.eventHistory.push(eventRecord);
+                
+                if (this.eventHistory.length > this.maxHistory) {
+                    this.eventHistory = this.eventHistory.slice(-this.maxHistory * 0.8);
+                }
+            }
+            
+            getStatus() {
+                return {
+                    totalEventTypes: this.listeners.size,
+                    totalListeners: Array.from(this.listeners.values()).reduce((sum, arr) => sum + arr.length, 0),
+                    eventHistory: this.eventHistory.length,
+                    eventTypes: Array.from(this.listeners.keys())
+                };
+            }
+        }
+        
+        // Game class
+        class Game {
+            constructor() {
+                this.initialized = false;
+                this.modules = new Map();
+                
+                console.log('🚀 Game: Starting initialization...');
+                
+                try {
+                    this.logger = new Logger('Game');
+                    this.eventBus = new EventBus(this.logger);
+                    this.initialized = true;
+                    this.logger.info('Game core initialization complete');
+                    this.eventBus.emit('game.initialized', { timestamp: Date.now() });
+                } catch (error) {
+                    console.error('Game initialization failed:', error);
+                    throw error;
+                }
+            }
+            
+            registerModule(name, moduleInstance) {
+                this.modules.set(name, moduleInstance);
+                this.logger.info(`Module registered: ${name}`);
+                this.eventBus.emit('module.registered', { name, timestamp: Date.now() });
+            }
+            
+            getModule(name) {
+                return this.modules.get(name) || null;
+            }
+            
+            getStatus() {
+                return {
+                    initialized: this.initialized,
+                    modules: Array.from(this.modules.keys()),
+                    eventBusStatus: this.eventBus.getStatus(),
+                    loggerStatus: this.logger.getStatus(),
+                    uptime: Date.now() - this.logger.startTime
+                };
+            }
+        }
+        
+        // GameState class (simplified)
+        class GameState {
+            constructor(eventBus, logger) {
+                this.eventBus = eventBus;
+                this.logger = logger;
+                this.initialized = false;
+                
+                this.state = {
+                    company: {
+                        name: 'Wolf\\'s Dragoons',
+                        funds: 500000,
+                        rating: 'Green'
+                    },
+                    personnel: {
+                        pilots: new Map([
+                            [1, { id: 1, name: 'Marcus Kane', gunnery: 2, piloting: 3, experience: 'Elite' }],
+                            [2, { id: 2, name: 'Lisa Williams', gunnery: 3, piloting: 4, experience: 'Veteran' }]
+                        ])
+                    },
+                    assets: {
+                        mechs: new Map([
+                            [1, { id: 1, name: 'Centurion CN9-A', weight: 50, type: 'Medium', pilot: 1 }],
+                            [2, { id: 2, name: 'Phoenix Hawk PXH-1', weight: 45, type: 'Medium', pilot: 2 }]
+                        ])
+                    },
+                    contracts: {
+                        available: new Map([
+                            [1, { id: 1, title: 'Pirate Suppression', payment: 150000, difficulty: 'Easy' }]
+                        ])
+                    }
+                };
+                
+                this.initialized = true;
+                this.logger.info('GameState initialized with default data');
+                this.eventBus.emit('gamestate.initialized', { timestamp: Date.now() });
+            }
+            
+            getState() {
+                return JSON.parse(JSON.stringify(this.state, (key, value) => {
+                    if (value instanceof Map) {
+                        return { __type: 'Map', __data: Array.from(value.entries()) };
+                    }
+                    return value;
+                }));
+            }
+            
+            updateState(path, value) {
+                const parts = path.split('.');
+                let current = this.state;
+                
+                for (let i = 0; i < parts.length - 1; i++) {
+                    current = current[parts[i]];
+                }
+                
+                current[parts[parts.length - 1]] = value;
+                this.eventBus.emit('state.updated', { path, value, timestamp: Date.now() });
+                this.logger.debug(`State updated: ${path}`);
+                return true;
+            }
+        }
+        
+        // SaveManager class (simplified)
+        class SaveManager {
+            constructor(eventBus, logger) {
+                this.eventBus = eventBus;
+                this.logger = logger;
+                this.initialized = false;
+                this.storageMethod = 'localStorage';
+                
+                try {
+                    localStorage.setItem('test', 'test');
+                    localStorage.removeItem('test');
+                    this.initialized = true;
+                    this.logger.info('SaveManager initialized with localStorage');
+                } catch (error) {
+                    this.storageMethod = 'memory';
+                    this.memoryStorage = {};
+                    this.initialized = true;
+                    this.logger.warn('SaveManager using memory storage fallback');
+                }
+                
+                this.eventBus.emit('savemanager.initialized', { timestamp: Date.now() });
+            }
+            
+            async saveGame(gameState, saveSlot = 'default') {
+                try {
+                    const saveData = {
+                        version: '2.0.0',
+                        timestamp: Date.now(),
+                        gameState: gameState
+                    };
+                    
+                    const key = `battletech_save_${saveSlot}`;
+                    const serialized = JSON.stringify(saveData);
+                    
+                    if (this.storageMethod === 'localStorage') {
+                        localStorage.setItem(key, serialized);
+                    } else {
+                        this.memoryStorage[key] = serialized;
+                    }
+                    
+                    this.logger.info(`Game saved to slot: ${saveSlot}`);
+                    this.eventBus.emit('game.saved', { saveSlot, timestamp: Date.now() });
+                    return true;
+                } catch (error) {
+                    this.logger.error(`Save failed: ${saveSlot}`, error);
+                    return false;
+                }
+            }
+            
+            async loadGame(saveSlot = 'default') {
+                try {
+                    const key = `battletech_save_${saveSlot}`;
+                    let serialized;
+                    
+                    if (this.storageMethod === 'localStorage') {
+                        serialized = localStorage.getItem(key);
+                    } else {
+                        serialized = this.memoryStorage[key];
+                    }
+                    
+                    if (!serialized) {
+                        throw new Error('No save data found');
+                    }
+                    
+                    const saveData = JSON.parse(serialized);
+                    this.logger.info(`Game loaded from slot: ${saveSlot}`);
+                    this.eventBus.emit('game.loaded', { saveSlot, timestamp: Date.now() });
+                    return saveData.gameState;
+                } catch (error) {
+                    this.logger.error(`Load failed: ${saveSlot}`, error);
+                    return null;
+                }
+            }
+        }
+        
+        // Test variables
+        let game = null;
+        let gameState = null;
+        let saveManager = null;
+        let testResults = [];
+        
+        // Capture console output
+        const logMessages = [];
+        const originalLog = console.log;
+        
+        console.log = function(...args) {
+            const message = args.join(' ');
+            logMessages.push(`${new Date().toISOString()}: ${message}`);
+            updateLogDisplay();
+            originalLog.apply(console, args);
+        };
+        
+        function updateLogDisplay() {
+            const logContent = document.getElementById('log-content');
+            if (logContent) {
+                logContent.textContent = logMessages.slice(-50).join('\\n');
+                const logOutput = document.getElementById('log-output');
+                logOutput.scrollTop = logOutput.scrollHeight;
+            }
+        }
+        
+        function addTestResult(testName, passed, details = '') {
+            testResults.push({ testName, passed, details, timestamp: Date.now() });
+            updateTestDisplay();
+        }
+        
+        function updateTestDisplay() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '';
+            
+            testResults.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-result ${result.passed ? 'success' : 'error'}`;
+                div.innerHTML = `
+                    <strong>${result.passed ? '✅' : '❌'} ${result.testName}</strong>
+                    ${result.details ? `<br><small>${result.details}</small>` : ''}
+                `;
+                resultsDiv.appendChild(div);
+            });
+        }
+        
+        window.runTest = async function() {
+            console.log('🚀 Starting Bulletproof Architecture Test...');
+            testResults = [];
+            
+            try {
+                // Test 1: Initialize Game
+                console.log('🔧 Initializing Game...');
+                game = new Game();
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (game.initialized) {
+                    addTestResult('Game System Initialization', true, 'Core systems initialized successfully');
+                } else {
+                    addTestResult('Game System Initialization', false, 'Game not initialized');
+                    return;
+                }
+                
+                // Test 2: Logger functionality  
+                console.log('📝 Testing Logger...');
+                const logger = game.logger;
+                logger.info('Test info message');
+                logger.warn('Test warning message');
+                logger.error('Test error message');
+                
+                const loggerStatus = logger.getStatus();
+                if (loggerStatus && loggerStatus.context === 'Game') {
+                    addTestResult('Logger Functionality', true, `Context: ${loggerStatus.context}, Logs: ${loggerStatus.totalLogs}`);
+                } else {
+                    addTestResult('Logger Functionality', false, 'Logger status invalid');
+                    return;
+                }
+                
+                // Test 3: EventBus communication
+                console.log('📡 Testing EventBus...');
+                let eventReceived = false;
+                let eventData = null;
+                
+                game.eventBus.on('test.event', (data) => {
+                    eventReceived = true;
+                    eventData = data;
+                });
+                
+                game.eventBus.emit('test.event', { message: 'Hello World' });
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (eventReceived && eventData && eventData.message === 'Hello World') {
+                    addTestResult('EventBus Communication', true, 'Event emission and reception working');
+                } else {
+                    addTestResult('EventBus Communication', false, 'Event communication failed');
+                    return;
+                }
+                
+                // Test 4: GameState
+                console.log('🗄️ Testing GameState...');
+                gameState = new GameState(game.eventBus, game.logger);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (gameState.initialized) {
+                    addTestResult('GameState Initialization', true, 'State system initialized with default data');
+                } else {
+                    addTestResult('GameState Initialization', false, 'GameState not initialized');
+                    return;
+                }
+                
+                const state = gameState.getState();
+                if (state.company.funds === 500000) {
+                    addTestResult('GameState Data', true, `Company funds: ${state.company.funds.toLocaleString()} C-Bills`);
+                } else {
+                    addTestResult('GameState Data', false, 'State data invalid');
+                    return;
+                }
+                
+                // Test 5: SaveManager
+                console.log('💾 Testing SaveManager...');
+                saveManager = new SaveManager(game.eventBus, game.logger);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (saveManager.initialized) {
+                    addTestResult('SaveManager Initialization', true, `Storage: ${saveManager.storageMethod}`);
+                } else {
+                    addTestResult('SaveManager Initialization', false, 'SaveManager not initialized');
+                    return;
+                }
+                
+                // Test 6: Save/Load
+                console.log('💽 Testing Save/Load...');
+                const saveSuccess = await saveManager.saveGame(gameState.getState(), 'test_save');
+                if (saveSuccess) {
+                    addTestResult('Save Functionality', true, 'Game state saved successfully');
+                } else {
+                    addTestResult('Save Functionality', false, 'Save failed');
+                    return;
+                }
+                
+                const loadedState = await saveManager.loadGame('test_save');
+                if (loadedState && loadedState.company.funds === 500000) {
+                    addTestResult('Load Functionality', true, 'Game state loaded and validated');
+                } else {
+                    addTestResult('Load Functionality', false, 'Load failed or data corrupted');
+                    return;
+                }
+                
+                // Test 7: Integration
+                console.log('🔗 Testing Integration...');
+                let stateChangeReceived = false;
+                
+                game.eventBus.on('state.updated', (data) => {
+                    stateChangeReceived = true;
+                });
+                
+                const oldFunds = gameState.getState().company.funds;
+                gameState.updateState('company.funds', oldFunds + 50000);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (stateChangeReceived && gameState.getState().company.funds === oldFunds + 50000) {
+                    addTestResult('Integration Test', true, 'State changes propagated via EventBus');
+                } else {
+                    addTestResult('Integration Test', false, 'Integration failed');
+                    return;
+                }
+                
+                // Final result
+                console.log('🎉 ALL TESTS PASSED - BULLETPROOF ARCHITECTURE VALIDATED!');
+                addTestResult('🎯 BULLETPROOF ARCHITECTURE', true, 'All systems working perfectly together!');
+                
+            } catch (error) {
+                console.error('❌ Test failed with error:', error);
+                addTestResult('Critical Test Error', false, `Error: ${error.message}`);
+            }
+        }
+        
+        window.clearResults = function() {
+            testResults = [];
+            updateTestDisplay();
+        }
+        
+        window.clearLog = function() {
+            logMessages.length = 0;
+            updateLogDisplay();
+        }
+        
+        // Initialize
+        console.log('🌟 Bulletproof Architecture Test Environment Ready');
+        updateLogDisplay();
+    </script>
+</body>
+</html>

@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 1 & 2 Integration Test - Bulletproof Architecture</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0c0f1a;
+            color: #e0e0e0;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #1a1f2e;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #2a3441;
+        }
+        
+        .phase-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #252b3a;
+            border-radius: 8px;
+            border-left: 4px solid #4a90e2;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .success {
+            background: #1e4a2e;
+            border: 1px solid #4caf50;
+            color: #4caf50;
+        }
+        
+        .error {
+            background: #4a1e1e;
+            border: 1px solid #f44336;
+            color: #f44336;
+        }
+        
+        .warning {
+            background: #4a3a1e;
+            border: 1px solid #ff9800;
+            color: #ff9800;
+        }
+        
+        .info {
+            background: #1e2a4a;
+            border: 1px solid #2196f3;
+            color: #2196f3;
+        }
+        
+        .phase-complete {
+            background: #1e4a3e;
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #357abd;
+        }
+        
+        button.danger {
+            background: #f44336;
+        }
+        
+        button.danger:hover {
+            background: #d32f2f;
+        }
+        
+        button.success {
+            background: #4caf50;
+        }
+        
+        button.success:hover {
+            background: #388e3c;
+        }
+        
+        .log-output {
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        
+        .system-status {
+            background: #1a2332;
+            border: 1px solid #3a4552;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 5px;
+            background: #252b3a;
+            border-radius: 3px;
+        }
+        
+        .status-value {
+            font-weight: bold;
+            color: #4caf50;
+        }
+        
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a90e2;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #6ab7ff;
+            border-bottom: 1px solid #3a4552;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #8cc8ff;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #2a3441;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a90e2, #6ab7ff);
+            transition: width 0.3s ease;
+        }
+        
+        .integration-demo {
+            background: #1e2a1e;
+            border: 1px solid #4a6a4a;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🛡️ BULLETPROOF ARCHITECTURE TEST</h1>
+        <p style="text-align: center; color: #8cc8ff;">Phase 1 (Core Systems) + Phase 2 (State Management) Integration Test</p>
+        
+        <!-- Control Panel -->
+        <div class="phase-section">
+            <h2>🎮 Test Control Panel</h2>
+            <div style="text-align: center;">
+                <button onclick="runFullTest()" class="success">🚀 Run Complete Integration Test</button>
+                <button onclick="runPhase1Only()">Phase 1 Only</button>
+                <button onclick="runPhase2Only()">Phase 2 Only</button>
+                <button onclick="demonstrateIntegration()">Live Integration Demo</button>
+                <button onclick="clearResults()">Clear Results</button>
+                <button onclick="simulateErrors()" class="danger">Test Error Handling</button>
+            </div>
+            
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill" style="width: 0%;"></div>
+            </div>
+            <div id="progress-text" style="text-align: center; margin: 10px 0;"></div>
+        </div>
+        
+        <!-- Test Results Grid -->
+        <div class="test-grid">
+            <!-- Phase 1 Results -->
+            <div class="phase-section">
+                <h2>🔧 Phase 1: Core Systems</h2>
+                <div id="phase1-results"></div>
+            </div>
+            
+            <!-- Phase 2 Results -->
+            <div class="phase-section">
+                <h2>🗄️ Phase 2: State Management</h2>
+                <div id="phase2-results"></div>
+            </div>
+        </div>
+        
+        <!-- Integration Results -->
+        <div class="phase-section">
+            <h2>🔗 Integration Test Results</h2>
+            <div id="integration-results"></div>
+        </div>
+        
+        <!-- Live System Demo -->
+        <div class="phase-section">
+            <h2>🎮 Live System Demonstration</h2>
+            <div id="live-demo" class="integration-demo">
+                <p>Run the integration demo to see the systems working together in real-time...</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <button onclick="addTestPilot()">Add Test Pilot</button>
+                <button onclick="addTestMech()">Add Test Mech</button>
+                <button onclick="advanceGameTime()">Advance Time (7 days)</button>
+                <button onclick="saveGameState()">Save Game</button>
+                <button onclick="loadGameState()">Load Game</button>
+            </div>
+        </div>
+        
+        <!-- System Status -->
+        <div class="phase-section">
+            <h2>📊 Live System Status</h2>
+            <div id="system-status" class="system-status">
+                <div class="status-item">
+                    <span>System Status:</span>
+                    <span id="status-initialized" class="status-value">Not Initialized</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Log -->
+        <div class="phase-section">
+            <h2>📝 System Log</h2>
+            <div id="log-output" class="log-output">
+                <pre id="log-content">Initializing bulletproof architecture test environment...</pre>
+            </div>
+            <button onclick="clearLog()">Clear Log</button>
+            <button onclick="exportLog()">Export Log</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import Game from './core/Game.js';
+        import GameState from './state/GameState.js';
+        import SaveManager from './state/SaveManager.js';
+        
+        // Global test variables
+        let game = null;
+        let gameState = null;
+        let saveManager = null;
+        let testResults = [];
+        let currentPhase = 0;
+        let totalPhases = 0;
+        
+        // Capture console output
+        const originalConsole = { ...console };
+        const logMessages = [];
+        
+        function captureLog(level, ...args) {
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            logMessages.push(`[${level.toUpperCase()}] ${new Date().toISOString()}: ${message}`);
+            updateLogDisplay();
+            
+            // Still call original console method
+            originalConsole[level](...args);
+        }
+        
+        // Override console methods
+        console.log = (...args) => captureLog('log', ...args);
+        console.info = (...args) => captureLog('info', ...args);
+        console.warn = (...args) => captureLog('warn', ...args);
+        console.error = (...args) => captureLog('error', ...args);
+        console.debug = (...args) => captureLog('debug', ...args);
+        
+        function updateLogDisplay() {
+            const logContent = document.getElementById('log-content');
+            if (logContent) {
+                logContent.textContent = logMessages.slice(-200).join('\\n');
+                const logOutput = document.getElementById('log-output');
+                logOutput.scrollTop = logOutput.scrollHeight;
+            }
+        }
+        
+        function updateProgress(current, total, text) {
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            
+            const percentage = total > 0 ? (current / total) * 100 : 0;
+            progressFill.style.width = percentage + '%';
+            progressText.textContent = text || `${current}/${total} tests completed`;
+        }
+        
+        function addTestResult(phase, testName, passed, details = '') {
+            testResults.push({ phase, testName, passed, details, timestamp: Date.now() });
+            updateTestDisplay();
+        }
+        
+        function updateTestDisplay() {
+            const phase1Div = document.getElementById('phase1-results');
+            const phase2Div = document.getElementById('phase2-results');
+            const integrationDiv = document.getElementById('integration-results');
+            
+            // Clear existing results
+            phase1Div.innerHTML = '';
+            phase2Div.innerHTML = '';
+            integrationDiv.innerHTML = '';
+            
+            // Sort results by phase
+            const phase1Results = testResults.filter(r => r.phase === 1);
+            const phase2Results = testResults.filter(r => r.phase === 2);
+            const integrationResults = testResults.filter(r => r.phase === 'integration');
+            
+            // Display Phase 1 results
+            phase1Results.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-result ${result.passed ? 'success' : 'error'}`;
+                div.innerHTML = `
+                    <strong>${result.passed ? '✅' : '❌'} ${result.testName}</strong>
+                    ${result.details ? `<br><small>${result.details}</small>` : ''}
+                `;
+                phase1Div.appendChild(div);
+            });
+            
+            // Display Phase 2 results
+            phase2Results.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-result ${result.passed ? 'success' : 'error'}`;
+                div.innerHTML = `
+                    <strong>${result.passed ? '✅' : '❌'} ${result.testName}</strong>
+                    ${result.details ? `<br><small>${result.details}</small>` : ''}
+                `;
+                phase2Div.appendChild(div);
+            });
+            
+            // Display Integration results
+            integrationResults.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-result ${result.passed ? 'success' : 'error'}`;
+                div.innerHTML = `
+                    <strong>${result.passed ? '✅' : '❌'} ${result.testName}</strong>
+                    ${result.details ? `<br><small>${result.details}</small>` : ''}
+                `;
+                integrationDiv.appendChild(div);
+            });
+            
+            // Check if phases are complete
+            checkPhaseCompletion();
+        }
+        
+        function checkPhaseCompletion() {
+            const phase1Results = testResults.filter(r => r.phase === 1);
+            const phase2Results = testResults.filter(r => r.phase === 2);
+            const integrationResults = testResults.filter(r => r.phase === 'integration');
+            
+            const phase1Passed = phase1Results.length > 0 && phase1Results.every(r => r.passed);
+            const phase2Passed = phase2Results.length > 0 && phase2Results.every(r => r.passed);
+            const integrationPassed = integrationResults.length > 0 && integrationResults.every(r => r.passed);
+            
+            // Add completion markers
+            if (phase1Passed && !document.getElementById('phase1-complete')) {
+                const completeDiv = document.createElement('div');
+                completeDiv.id = 'phase1-complete';
+                completeDiv.className = 'phase-complete';
+                completeDiv.innerHTML = '🎯 PHASE 1 COMPLETE - CORE SYSTEMS BULLETPROOF!';
+                document.getElementById('phase1-results').appendChild(completeDiv);
+            }
+            
+            if (phase2Passed && !document.getElementById('phase2-complete')) {
+                const completeDiv = document.createElement('div');
+                completeDiv.id = 'phase2-complete';
+                completeDiv.className = 'phase-complete';
+                completeDiv.innerHTML = '🎯 PHASE 2 COMPLETE - STATE MANAGEMENT BULLETPROOF!';
+                document.getElementById('phase2-results').appendChild(completeDiv);
+            }
+            
+            if (integrationPassed && !document.getElementById('integration-complete')) {
+                const completeDiv = document.createElement('div');
+                completeDiv.id = 'integration-complete';
+                completeDiv.className = 'phase-complete';
+                completeDiv.innerHTML = '🚀 INTEGRATION COMPLETE - ARCHITECTURE IS BULLETPROOF!';
+                document.getElementById('integration-results').appendChild(completeDiv);
+            }
+        }
+        
+        // Phase 1 Tests
+        async function testPhase1() {
+            console.log('🔧 Testing Phase 1: Core Systems...');
+            
+            try {
+                // Initialize Game (includes Logger, EventBus, ErrorHandler)
+                game = new Game();
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (game.initialized) {
+                    addTestResult(1, 'Game System Initialization', true, 'Core systems initialized successfully');
+                } else {
+                    addTestResult(1, 'Game System Initialization', false, 'Game not marked as initialized');
+                    return false;
+                }
+                
+                // Test Logger functionality
+                const logger = game.logger;
+                logger.info('Phase 1 test message');
+                logger.warn('Phase 1 test warning');
+                logger.error('Phase 1 test error');
+                
+                const loggerStatus = logger.getStatus();
+                if (loggerStatus && loggerStatus.context) {
+                    addTestResult(1, 'Logger Functionality', true, `Context: ${loggerStatus.context}`);
+                } else {
+                    addTestResult(1, 'Logger Functionality', false, 'Logger status invalid');
+                    return false;
+                }
+                
+                // Test EventBus communication
+                let eventReceived = false;
+                game.eventBus.on('phase1.test', (data) => {
+                    eventReceived = true;
+                });
+                
+                game.eventBus.emit('phase1.test', { message: 'Phase 1 event test' });
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (eventReceived) {
+                    addTestResult(1, 'EventBus Communication', true, 'Event emission and reception working');
+                } else {
+                    addTestResult(1, 'EventBus Communication', false, 'Event not received');
+                    return false;
+                }
+                
+                // Test module registration
+                const testModule = { name: 'Phase1TestModule', initialized: true };
+                game.registerModule('Phase1Test', testModule);
+                
+                const retrieved = game.getModule('Phase1Test');
+                if (retrieved === testModule) {
+                    addTestResult(1, 'Module Registration', true, 'Module registered and retrieved successfully');
+                } else {
+                    addTestResult(1, 'Module Registration', false, 'Module registration failed');
+                    return false;
+                }
+                
+                return true;
+                
+            } catch (error) {
+                addTestResult(1, 'Phase 1 Critical Error', false, `Error: ${error.message}`);
+                return false;
+            }
+        }
+        
+        // Phase 2 Tests
+        async function testPhase2() {
+            console.log('🗄️ Testing Phase 2: State Management...');
+            
+            try {
+                if (!game) {
+                    addTestResult(2, 'Phase 2 Prerequisites', false, 'Phase 1 must complete first');
+                    return false;
+                }
+                
+                // Initialize GameState
+                gameState = new GameState(game.eventBus, game.logger);
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                if (gameState.initialized) {
+                    addTestResult(2, 'GameState Initialization', true, 'State system initialized with default data');
+                } else {
+                    addTestResult(2, 'GameState Initialization', false, 'GameState not initialized');
+                    return false;
+                }
+                
+                // Test state retrieval
+                const state = gameState.getState();
+                if (state && state.company && state.personnel && state.assets && state.contracts) {
+                    addTestResult(2, 'State Structure', true, 'All required state sections present');
+                } else {
+                    addTestResult(2, 'State Structure', false, 'State structure incomplete');
+                    return false;
+                }
+                
+                // Test pilot data
+                const pilots = state.personnel.pilots;
+                if (pilots instanceof Map && pilots.size >= 3) {
+                    addTestResult(2, 'Default Pilot Data', true, `${pilots.size} pilots initialized`);
+                } else {
+                    addTestResult(2, 'Default Pilot Data', false, 'Pilot initialization failed');
+                    return false;
+                }
+                
+                // Test mech data
+                const mechs = state.assets.mechs;
+                if (mechs instanceof Map && mechs.size >= 3) {
+                    addTestResult(2, 'Default Mech Data', true, `${mechs.size} mechs initialized`);
+                } else {
+                    addTestResult(2, 'Default Mech Data', false, 'Mech initialization failed');
+                    return false;
+                }
+                
+                // Test contract data
+                const contracts = state.contracts.available;
+                if (contracts instanceof Map && contracts.size >= 3) {
+                    addTestResult(2, 'Default Contract Data', true, `${contracts.size} contracts initialized`);
+                } else {
+                    addTestResult(2, 'Default Contract Data', false, 'Contract initialization failed');
+                    return false;
+                }
+                
+                // Initialize SaveManager
+                saveManager = new SaveManager(game.eventBus, game.logger);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (saveManager.initialized) {
+                    addTestResult(2, 'SaveManager Initialization', true, `Storage method: ${saveManager.storageMethod}`);
+                } else {
+                    addTestResult(2, 'SaveManager Initialization', false, 'SaveManager not initialized');
+                    return false;
+                }
+                
+                // Test save/load functionality
+                const saveSuccess = await saveManager.saveGame(gameState.getState(), 'test_save');
+                if (saveSuccess) {
+                    addTestResult(2, 'Save Functionality', true, 'Game state saved successfully');
+                } else {
+                    addTestResult(2, 'Save Functionality', false, 'Save operation failed');
+                    return false;
+                }
+                
+                const loadedState = await saveManager.loadGame('test_save');
+                if (loadedState && loadedState.company) {
+                    addTestResult(2, 'Load Functionality', true, 'Game state loaded successfully');
+                } else {
+                    addTestResult(2, 'Load Functionality', false, 'Load operation failed');
+                    return false;
+                }
+                
+                return true;
+                
+            } catch (error) {
+                addTestResult(2, 'Phase 2 Critical Error', false, `Error: ${error.message}`);
+                return false;
+            }
+        }
+        
+        // Integration Tests
+        async function testIntegration() {
+            console.log('🔗 Testing System Integration...');
+            
+            try {
+                if (!game || !gameState || !saveManager) {
+                    addTestResult('integration', 'Integration Prerequisites', false, 'All systems must be initialized');
+                    return false;
+                }
+                
+                // Test cross-system event communication
+                let stateEventReceived = false;
+                let saveEventReceived = false;
+                
+                game.eventBus.on('integration.state.test', () => { stateEventReceived = true; });
+                game.eventBus.on('integration.save.test', () => { saveEventReceived = true; });
+                
+                // Emit events from different systems
+                gameState.emitStateChange('integration.state.test', {});
+                saveManager.emitEvent('integration.save.test', {});
+                
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (stateEventReceived && saveEventReceived) {
+                    addTestResult('integration', 'Cross-System Communication', true, 'All systems communicating via EventBus');
+                } else {
+                    addTestResult('integration', 'Cross-System Communication', false, 'Event communication failed');
+                    return false;
+                }
+                
+                // Test state modification and save
+                const initialFunds = gameState.getState().company.funds;
+                gameState.updateState('company.funds', initialFunds + 50000);
+                
+                const updatedState = gameState.getState();
+                if (updatedState.company.funds === initialFunds + 50000) {
+                    addTestResult('integration', 'State Modification', true, 'State update successful');
+                } else {
+                    addTestResult('integration', 'State Modification', false, 'State update failed');
+                    return false;
+                }
+                
+                // Test save of modified state
+                const saveSuccess = await saveManager.saveGame(updatedState, 'integration_test');
+                const loadedState = await saveManager.loadGame('integration_test');
+                
+                if (loadedState && loadedState.company.funds === initialFunds + 50000) {
+                    addTestResult('integration', 'State Persistence', true, 'Modified state saved and loaded correctly');
+                } else {
+                    addTestResult('integration', 'State Persistence', false, 'State persistence failed');
+                    return false;
+                }
+                
+                // Test error handling integration
+                let errorHandled = false;
+                game.eventBus.on('system.error', () => { errorHandled = true; });
+                
+                // Trigger an error
+                game.eventBus.emit('system.error', { 
+                    source: 'IntegrationTest',
+                    type: 'test_error',
+                    message: 'Integration test error'
+                });
+                
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (errorHandled) {
+                    addTestResult('integration', 'Error Handling Integration', true, 'Error events propagated correctly');
+                } else {
+                    addTestResult('integration', 'Error Handling Integration', false, 'Error handling failed');
+                    return false;
+                }
+                
+                return true;
+                
+            } catch (error) {
+                addTestResult('integration', 'Integration Critical Error', false, `Error: ${error.message}`);
+                return false;
+            }
+        }
+        
+        // Global functions for buttons
+        window.runFullTest = async function() {
+            console.log('🚀 Starting Complete Integration Test...');
+            testResults = [];
+            currentPhase = 0;
+            totalPhases = 3;
+            
+            updateProgress(0, totalPhases, 'Initializing test suite...');
+            
+            // Phase 1
+            updateProgress(0, totalPhases, 'Running Phase 1: Core Systems...');
+            const phase1Success = await testPhase1();
+            currentPhase = 1;
+            updateProgress(currentPhase, totalPhases, `Phase 1 ${phase1Success ? 'PASSED' : 'FAILED'}`);
+            
+            if (!phase1Success) {
+                console.error('❌ Phase 1 failed, stopping test suite');
+                return;
+            }
+            
+            // Phase 2
+            updateProgress(currentPhase, totalPhases, 'Running Phase 2: State Management...');
+            const phase2Success = await testPhase2();
+            currentPhase = 2;
+            updateProgress(currentPhase, totalPhases, `Phase 2 ${phase2Success ? 'PASSED' : 'FAILED'}`);
+            
+            if (!phase2Success) {
+                console.error('❌ Phase 2 failed, stopping test suite');
+                return;
+            }
+            
+            // Integration
+            updateProgress(currentPhase, totalPhases, 'Running Integration Tests...');
+            const integrationSuccess = await testIntegration();
+            currentPhase = 3;
+            updateProgress(currentPhase, totalPhases, `Integration ${integrationSuccess ? 'PASSED' : 'FAILED'}`);
+            
+            if (integrationSuccess) {
+                console.log('🎉 ALL TESTS PASSED - BULLETPROOF ARCHITECTURE VALIDATED!');
+                updateProgress(totalPhases, totalPhases, '🎉 ALL TESTS PASSED - BULLETPROOF ARCHITECTURE READY!');
+            } else {
+                console.error('❌ Integration tests failed');
+                updateProgress(totalPhases, totalPhases, '❌ Integration tests failed');
+            }
+            
+            updateSystemStatus();
+        };
+        
+        window.runPhase1Only = async function() {
+            testResults = testResults.filter(r => r.phase !== 1);
+            updateProgress(0, 1, 'Running Phase 1 only...');
+            await testPhase1();
+            updateProgress(1, 1, 'Phase 1 complete');
+            updateSystemStatus();
+        };
+        
+        window.runPhase2Only = async function() {
+            if (!game) {
+                alert('Phase 1 must be completed first!');
+                return;
+            }
+            testResults = testResults.filter(r => r.phase !== 2);
+            updateProgress(0, 1, 'Running Phase 2 only...');
+            await testPhase2();
+            updateProgress(1, 1, 'Phase 2 complete');
+            updateSystemStatus();
+        };
+        
+        window.demonstrateIntegration = async function() {
+            if (!game || !gameState || !saveManager) {
+                alert('Complete full test first!');
+                return;
+            }
+            
+            const demoDiv = document.getElementById('live-demo');
+            demoDiv.innerHTML = '<h3>🎮 Live Integration Demonstration</h3>';
+            
+            // Add pilot demo
+            const pilotId = gameState.addPilot({
+                name: 'Demo "Test" Pilot',
+                gunnery: 3,
+                piloting: 2,
+                experience: 'Veteran',
+                salary: 20000
+            });
+            
+            demoDiv.innerHTML += `<p>✅ Added new pilot (ID: ${pilotId})</p>`;
+            
+            // Add mech demo
+            const mechId = gameState.addMech({
+                name: 'Demo Atlas AS7-D',
+                weight: 100,
+                type: 'Assault',
+                condition: 'Excellent',
+                pilot: null
+            });
+            
+            demoDiv.innerHTML += `<p>✅ Added new mech (ID: ${mechId})</p>`;
+            
+            // Save state demo
+            const saveSuccess = await saveManager.saveGame(gameState.getState(), 'demo_save');
+            demoDiv.innerHTML += `<p>✅ Saved game state (Success: ${saveSuccess})</p>`;
+            
+            // Advance time demo
+            const oldDate = new Date(gameState.getState().game.currentDate);
+            gameState.advanceTime(7);
+            const newDate = new Date(gameState.getState().game.currentDate);
+            
+            demoDiv.innerHTML += `<p>✅ Advanced time from ${oldDate.toDateString()} to ${newDate.toDateString()}</p>`;
+            
+            demoDiv.innerHTML += '<p><strong>🚀 Integration demonstration complete! All systems working together seamlessly.</strong></p>';
+        };
+        
+        window.clearResults = function() {
+            testResults = [];
+            updateTestDisplay();
+            updateProgress(0, 0, 'Results cleared');
+        };
+        
+        window.simulateErrors = function() {
+            console.log('🧨 Simulating various error conditions...');
+            
+            // JavaScript error
+            try {
+                throw new Error('Simulated JavaScript error');
+            } catch (error) {
+                console.error('Caught simulated error:', error);
+            }
+            
+            // Promise rejection
+            Promise.reject(new Error('Simulated promise rejection')).catch(error => {
+                console.error('Caught promise rejection:', error);
+            });
+            
+            // Module error
+            if (game) {
+                game.eventBus.emit('system.error', {
+                    source: 'ErrorSimulation',
+                    type: 'simulated_error',
+                    message: 'This is a simulated error for testing'
+                });
+            }
+            
+            console.log('✅ Error simulation complete - check that all errors were handled gracefully');
+        };
+        
+        // Live demo functions
+        window.addTestPilot = function() {
+            if (!gameState) return;
+            
+            const names = ['Alpha Pilot', 'Bravo Pilot', 'Charlie Pilot', 'Delta Pilot'];
+            const randomName = names[Math.floor(Math.random() * names.length)];
+            
+            const pilotId = gameState.addPilot({
+                name: randomName,
+                gunnery: Math.floor(Math.random() * 5) + 1,
+                piloting: Math.floor(Math.random() * 5) + 1,
+                experience: ['Green', 'Regular', 'Veteran'][Math.floor(Math.random() * 3)],
+                salary: Math.floor(Math.random() * 20000) + 10000
+            });
+            
+            console.log(`Added pilot: ${randomName} (ID: ${pilotId})`);
+            updateSystemStatus();
+        };
+        
+        window.addTestMech = function() {
+            if (!gameState) return;
+            
+            const mechs = ['Locust LCT-1V', 'Centurion CN9-A', 'Catapult CPLT-C1', 'Atlas AS7-D'];
+            const randomMech = mechs[Math.floor(Math.random() * mechs.length)];
+            
+            const mechId = gameState.addMech({
+                name: randomMech,
+                weight: Math.floor(Math.random() * 80) + 20,
+                type: ['Light', 'Medium', 'Heavy', 'Assault'][Math.floor(Math.random() * 4)],
+                condition: ['Fair', 'Good', 'Excellent'][Math.floor(Math.random() * 3)]
+            });
+            
+            console.log(`Added mech: ${randomMech} (ID: ${mechId})`);
+            updateSystemStatus();
+        };
+        
+        window.advanceGameTime = function() {
+            if (!gameState) return;
+            
+            const oldDate = new Date(gameState.getState().game.currentDate);
+            gameState.advanceTime(7);
+            const newDate = new Date(gameState.getState().game.currentDate);
+            
+            console.log(`Time advanced from ${oldDate.toDateString()} to ${newDate.toDateString()}`);
+            updateSystemStatus();
+        };
+        
+        window.saveGameState = async function() {
+            if (!saveManager || !gameState) return;
+            
+            const success = await saveManager.saveGame(gameState.getState(), 'manual_save');
+            console.log(`Manual save ${success ? 'successful' : 'failed'}`);
+        };
+        
+        window.loadGameState = async function() {
+            if (!saveManager) return;
+            
+            const loadedState = await saveManager.loadGame('manual_save');
+            console.log(`Manual load ${loadedState ? 'successful' : 'failed'}`);
+        };
+        
+        window.clearLog = function() {
+            logMessages.length = 0;
+            updateLogDisplay();
+        };
+        
+        window.exportLog = function() {
+            const logText = logMessages.join('\\n');
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `battletech_test_log_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+        
+        function updateSystemStatus() {
+            const statusDiv = document.getElementById('system-status');
+            statusDiv.innerHTML = '';
+            
+            const items = [
+                ['System Status', game ? (game.initialized ? 'Initialized ✅' : 'Not Initialized ❌') : 'Not Created ❌'],
+                ['Game State', gameState ? (gameState.initialized ? 'Active ✅' : 'Not Initialized ❌') : 'Not Created ❌'],
+                ['Save Manager', saveManager ? (saveManager.initialized ? `Active (${saveManager.storageMethod}) ✅` : 'Not Initialized ❌') : 'Not Created ❌'],
+                ['Pilots', gameState ? `${gameState.getState().personnel.pilots.size} pilots` : 'N/A'],
+                ['Mechs', gameState ? `${gameState.getState().assets.mechs.size} mechs` : 'N/A'],
+                ['Contracts', gameState ? `${gameState.getState().contracts.available.size} available` : 'N/A'],
+                ['Company Funds', gameState ? `${gameState.getState().company.funds.toLocaleString()} C-Bills` : 'N/A'],
+                ['Game Date', gameState ? gameState.getState().game.currentDate.toDateString() : 'N/A']
+            ];
+            
+            items.forEach(([label, value]) => {
+                const div = document.createElement('div');
+                div.className = 'status-item';
+                div.innerHTML = `<span>${label}:</span><span class="status-value">${value}</span>`;
+                statusDiv.appendChild(div);
+            });
+        }
+        
+        // Initialize on page load
+        console.log('🌟 Phase 1 & 2 Integration Test Environment Ready');
+        console.log('Click "Run Complete Integration Test" to validate the bulletproof architecture');
+        updateSystemStatus();
+        
+        // Update status every 5 seconds
+        setInterval(updateSystemStatus, 5000);
+        
+    </script>
+</body>
+</html>

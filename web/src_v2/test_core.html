@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulletproof Core Systems Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0c0f1a;
+            color: #e0e0e0;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1a1f2e;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #2a3441;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #252b3a;
+            border-radius: 5px;
+            border-left: 4px solid #4a90e2;
+        }
+        
+        .test-result {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        
+        .success {
+            background: #1e4a2e;
+            border: 1px solid #4caf50;
+            color: #4caf50;
+        }
+        
+        .error {
+            background: #4a1e1e;
+            border: 1px solid #f44336;
+            color: #f44336;
+        }
+        
+        .warning {
+            background: #4a3a1e;
+            border: 1px solid #ff9800;
+            color: #ff9800;
+        }
+        
+        .info {
+            background: #1e2a4a;
+            border: 1px solid #2196f3;
+            color: #2196f3;
+        }
+        
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #357abd;
+        }
+        
+        .log-output {
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🛡️ Bulletproof Core Systems Test</h1>
+        <p>Testing the core foundation modules: Logger, EventBus, Game, and ErrorHandler</p>
+        
+        <div class="test-section">
+            <h2>Phase 1: Core System Tests</h2>
+            <button onclick="runAllTests()">Run All Tests</button>
+            <button onclick="clearResults()">Clear Results</button>
+            <button onclick="simulateError()">Test Error Handling</button>
+            <button onclick="showSystemStatus()">Show System Status</button>
+            
+            <div id="test-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>System Log Output</h2>
+            <div id="log-output" class="log-output">
+                <pre id="log-content">Initializing test environment...</pre>
+            </div>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import Game from './core/Game.js';
+        import Logger from './utils/Logger.js';
+        import EventBus from './core/EventBus.js';
+        import ErrorHandler from './utils/ErrorHandler.js';
+        
+        // Global test variables
+        let game;
+        let testResults = [];
+        
+        // Capture console output
+        const originalConsole = { ...console };
+        const logMessages = [];
+        
+        function captureLog(level, ...args) {
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            logMessages.push(`[${level.toUpperCase()}] ${new Date().toISOString()}: ${message}`);
+            updateLogDisplay();
+            
+            // Still call original console method
+            originalConsole[level](...args);
+        }
+        
+        console.log = (...args) => captureLog('log', ...args);
+        console.info = (...args) => captureLog('info', ...args);
+        console.warn = (...args) => captureLog('warn', ...args);
+        console.error = (...args) => captureLog('error', ...args);
+        console.debug = (...args) => captureLog('debug', ...args);
+        
+        function updateLogDisplay() {
+            const logContent = document.getElementById('log-content');
+            if (logContent) {
+                logContent.textContent = logMessages.slice(-100).join('\n');
+                const logOutput = document.getElementById('log-output');
+                logOutput.scrollTop = logOutput.scrollHeight;
+            }
+        }
+        
+        function addTestResult(testName, passed, details = '') {
+            testResults.push({ testName, passed, details, timestamp: Date.now() });
+            updateTestDisplay();
+        }
+        
+        function updateTestDisplay() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '';
+            
+            testResults.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-result ${result.passed ? 'success' : 'error'}`;
+                div.innerHTML = `
+                    <strong>${result.passed ? '✅' : '❌'} ${result.testName}</strong>
+                    ${result.details ? `<br><small>${result.details}</small>` : ''}
+                `;
+                resultsDiv.appendChild(div);
+            });
+        }
+        
+        // Test Functions
+        async function testLogger() {
+            console.log('🧪 Testing Logger...');
+            try {
+                const logger = new Logger('TestLogger');
+                
+                // Test basic logging methods
+                logger.info('Test info message');
+                logger.warn('Test warning message');
+                logger.error('Test error message');
+                logger.debug('Test debug message');
+                
+                // Test status
+                const status = logger.getStatus();
+                if (status && status.context === 'TestLogger') {
+                    addTestResult('Logger Creation & Status', true);
+                } else {
+                    addTestResult('Logger Creation & Status', false, 'Status check failed');
+                    return false;
+                }
+                
+                // Test log storage
+                const recentLogs = logger.getRecentLogs(5);
+                if (Array.isArray(recentLogs) && recentLogs.length > 0) {
+                    addTestResult('Logger Storage', true);
+                } else {
+                    addTestResult('Logger Storage', false, 'No logs stored');
+                    return false;
+                }
+                
+                return true;
+                
+            } catch (error) {
+                addTestResult('Logger Test', false, `Error: ${error.message}`);
+                return false;
+            }
+        }
+        
+        async function testEventBus() {
+            console.log('🧪 Testing EventBus...');
+            try {
+                const logger = new Logger('EventBusTest');
+                const eventBus = new EventBus(logger);
+                
+                let eventReceived = false;
+                let eventData = null;
+                
+                // Test event subscription and emission
+                eventBus.on('test.event', (data) => {
+                    eventReceived = true;
+                    eventData = data;
+                });
+                
+                eventBus.emit('test.event', { message: 'Hello World' });
+                
+                // Give a moment for async operations
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (eventReceived && eventData && eventData.message === 'Hello World') {
+                    addTestResult('EventBus Communication', true);
+                } else {
+                    addTestResult('EventBus Communication', false, 'Event not received properly');
+                    return false;
+                }
+                
+                // Test status
+                const status = eventBus.getStatus();
+                if (status && typeof status.totalEventTypes === 'number') {
+                    addTestResult('EventBus Status', true);
+                } else {
+                    addTestResult('EventBus Status', false, 'Status invalid');
+                    return false;
+                }
+                
+                return true;
+                
+            } catch (error) {
+                addTestResult('EventBus Test', false, `Error: ${error.message}`);
+                return false;
+            }
+        }
+        
+        async function testGame() {
+            console.log('🧪 Testing Game System...');
+            try {
+                game = new Game();
+                
+                // Test initialization
+                if (game.initialized) {
+                    addTestResult('Game Initialization', true);
+                } else {
+                    addTestResult('Game Initialization', false, 'Game not marked as initialized');
+                    return false;
+                }
+                
+                // Test module registration
+                const testModule = {
+                    name: 'TestModule',
+                    initialized: true,
+                    shutdown: () => console.log('Test module shutdown')
+                };
+                
+                game.registerModule('TestModule', testModule);
+                
+                const retrievedModule = game.getModule('TestModule');
+                if (retrievedModule === testModule) {
+                    addTestResult('Game Module Registration', true);
+                } else {
+                    addTestResult('Game Module Registration', false, 'Module not retrieved properly');
+                    return false;
+                }
+                
+                // Test status
+                const status = game.getStatus();
+                if (status && status.initialized && status.modules.includes('TestModule')) {
+                    addTestResult('Game Status', true);
+                } else {
+                    addTestResult('Game Status', false, 'Status check failed');
+                    return false;
+                }
+                
+                return true;
+                
+            } catch (error) {
+                addTestResult('Game Test', false, `Error: ${error.message}`);
+                return false;
+            }
+        }
+        
+        async function testErrorHandler() {
+            console.log('🧪 Testing ErrorHandler...');
+            try {
+                const logger = new Logger('ErrorHandlerTest');
+                const eventBus = new EventBus(logger);
+                const errorHandler = new ErrorHandler(logger, eventBus);
+                
+                let errorEventReceived = false;
+                
+                // Listen for error events
+                eventBus.on('system.error', (data) => {
+                    errorEventReceived = true;
+                    console.log('Error event received:', data);
+                });
+                
+                // Test module error handling
+                const testError = new Error('Test error message');
+                errorHandler.handleModuleError('TestModule', testError, { test: true });
+                
+                // Give a moment for async operations
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (errorEventReceived) {
+                    addTestResult('ErrorHandler Event Emission', true);
+                } else {
+                    addTestResult('ErrorHandler Event Emission', false, 'Error event not emitted');
+                    return false;
+                }
+                
+                // Test error statistics
+                const stats = errorHandler.getErrorStats();
+                if (stats && typeof stats.totalErrors === 'number') {
+                    addTestResult('ErrorHandler Statistics', true);
+                } else {
+                    addTestResult('ErrorHandler Statistics', false, 'Stats not available');
+                    return false;
+                }
+                
+                return true;
+                
+            } catch (error) {
+                addTestResult('ErrorHandler Test', false, `Error: ${error.message}`);
+                return false;
+            }
+        }
+        
+        async function testIntegration() {
+            console.log('🧪 Testing System Integration...');
+            try {
+                if (!game) {
+                    addTestResult('Integration Test', false, 'Game not initialized');
+                    return false;
+                }
+                
+                let integrationEventReceived = false;
+                
+                // Test cross-system communication
+                game.eventBus.on('integration.test', (data) => {
+                    integrationEventReceived = true;
+                    console.log('Integration test event received:', data);
+                });
+                
+                // Emit test event
+                game.eventBus.emit('integration.test', { 
+                    message: 'Integration test successful',
+                    timestamp: Date.now()
+                });
+                
+                // Give a moment for async operations
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                if (integrationEventReceived) {
+                    addTestResult('System Integration', true);
+                } else {
+                    addTestResult('System Integration', false, 'Integration event not received');
+                    return false;
+                }
+                
+                return true;
+                
+            } catch (error) {
+                addTestResult('Integration Test', false, `Error: ${error.message}`);
+                return false;
+            }
+        }
+        
+        // Global functions for buttons
+        window.runAllTests = async function() {
+            console.log('🚀 Starting Core Systems Test Suite...');
+            testResults = [];
+            
+            const tests = [
+                testLogger,
+                testEventBus,
+                testGame,
+                testErrorHandler,
+                testIntegration
+            ];
+            
+            let passedTests = 0;
+            
+            for (const test of tests) {
+                try {
+                    const result = await test();
+                    if (result) passedTests++;
+                } catch (error) {
+                    console.error('Test failed with exception:', error);
+                }
+            }
+            
+            console.log(`🏁 Test Suite Complete: ${passedTests}/${tests.length} tests passed`);
+            
+            if (passedTests === tests.length) {
+                addTestResult('🎯 ALL TESTS PASSED', true, 'Core systems are bulletproof and ready!');
+            } else {
+                addTestResult('⚠️ Some Tests Failed', false, `${passedTests}/${tests.length} passed`);
+            }
+        };
+        
+        window.clearResults = function() {
+            testResults = [];
+            updateTestDisplay();
+        };
+        
+        window.simulateError = function() {
+            console.log('🧨 Simulating error for testing...');
+            try {
+                // This will cause an intentional error
+                throw new Error('Simulated test error - this is intentional');
+            } catch (error) {
+                console.error('Simulated error caught:', error);
+            }
+        };
+        
+        window.showSystemStatus = function() {
+            if (game) {
+                const status = game.getStatus();
+                console.log('📊 Current System Status:', status);
+                
+                const statusDiv = document.createElement('div');
+                statusDiv.className = 'test-result info';
+                statusDiv.innerHTML = `
+                    <strong>📊 System Status</strong><br>
+                    <small>
+                        Initialized: ${status.initialized}<br>
+                        Modules: ${status.modules.join(', ')}<br>
+                        Uptime: ${Math.round(status.uptime / 1000)}s<br>
+                        EventBus Events: ${status.eventBusStatus?.totalEventTypes || 0}
+                    </small>
+                `;
+                document.getElementById('test-results').appendChild(statusDiv);
+            } else {
+                console.warn('Game not initialized yet');
+            }
+        };
+        
+        window.clearLog = function() {
+            logMessages.length = 0;
+            updateLogDisplay();
+        };
+        
+        // Initialize on page load
+        console.log('🌟 Core Systems Test Environment Ready');
+        console.log('Click "Run All Tests" to validate the bulletproof architecture');
+        
+    </script>
+</body>
+</html>
