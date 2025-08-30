@@ -84,6 +84,19 @@ export class Logger {
   }
 
   /**
+   * Log fatal error message - always logged regardless of level
+   */
+  fatal(message, ...args) {
+    const formattedArgs = this.formatMessage('FATAL', message, ...args);
+    console.error(...formattedArgs);
+    
+    // In development, also trigger a stack trace
+    if (this.isDevelopment) {
+      console.trace('FATAL ERROR STACK TRACE');
+    }
+  }
+
+  /**
    * Log with custom level
    */
   log(level, message, ...args) {
